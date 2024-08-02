@@ -30,6 +30,7 @@ struct planet {
     Vector2 summedForce;
     Color   color;
     float   radius;
+    Vector2 *trail;
 };
 
 extern struct planet planets[3];

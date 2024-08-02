@@ -4,9 +4,6 @@
 #include "include/planets.h"
 #include <stdio.h>
 
-#if defined(PLATFORM_WEB)
-    #include <emscripten/emscripten.h>
-#endif
 
 #define PIX_TRAIL   (400)
 #define GAMMA (6.674e-11f)
@@ -18,12 +15,17 @@
 //----------------------------------------------------------------------------------
 Font font;
 
+float time;
 
 
-Vector2 trail[PIX_TRAIL]  =  {0};
+unsigned int tick = 0u;
+
+Vector2 trail_A[PIX_TRAIL]  =  {0};
+Vector2 trail_B[PIX_TRAIL]  =  {0};
+Vector2 trail_C[PIX_TRAIL]  =  {0};
 
 const int screenWidth = 1200;
-const int screenHeight = 1024;
+const int screenHeight = 800;
 
 int screenCenterX = screenWidth*0.5f;
 int screenCenterY = screenHeight*0.5f;
@@ -31,8 +33,6 @@ float pixelPerMeter = 1.f;
 float timeScale = 1.f;
 Vector2 centerFOV = {0};
 const Vector2 screenCenter =  {screenWidth*0.5, screenHeight*0.5};
-
-uint64_t tick = 0;
 
 //----------------------------------------------------------------------------------
 // Local Functions Declaration
@@ -47,34 +47,46 @@ static inline void printVect2(const Vector2 * const v) {
 //----------------------------------------------------------------------------------
 // Main entry point
 //----------------------------------------------------------------------------------
-int main()
+int main(void)
 {
+
+    InitWindow(screenWidth, screenHeight, "planetoids");
+
+    time = 0.f;
+        printf("%d \n", 1000000);
+    
+
     // Initialization
     //--------------------------------------------------------------------------------------
 
     //pixelPerMeter = MIN(screenHeight,screenWidth) / 384400e3f / 2.3f ;
-    pixelPerMeter = 3.047263e-09;
+    pixelPerMeter = 3.e-09;
     //pixelPerMeter = 1.5f / planets[1].radius;
 
     timeScale = 24.f * 3600.f; // screenSecundum/realSecundum
+    printf("%d \n", 0);
 
-    InitWindow(screenWidth, screenHeight, "raylib");
+    printf("%d \n", 10);
     font = LoadFontEx("resources/Terminus.ttf", 32, 0, 250);
+    printf("%d \n", 11);
 
+    planets[0].trail = trail_A;
+    planets[1].trail = trail_B;
+    planets[2].trail = trail_C;
 
+    printf("%d \n", 12);
     //--------------------------------------------------------------------------------------
 
-#if defined(PLATFORM_WEB)
-    emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
-#else
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    while (WindowShouldClose())    // Detect window close button or ESC key
     {
 
         tick++;
+
+        //printf("%d \n", tick);
 
         int key = GetKeyPressed();
         switch (key)
@@ -104,7 +116,6 @@ int main()
         case KEY_LEFT_CONTROL:
             pixelPerMeter *= 0.9;
             printf("pixelPerMeter:\t%e\n", pixelPerMeter);
-
             break;
         case KEY_SPACE:
             centerFOV = planets[1].position;
@@ -118,15 +129,11 @@ int main()
         } else {
             centerFOV = planets[0].position;
         }
-
-
-
         UpdateDrawFrame();
     }
-#endif
-
     // De-Initialization
     //--------------------------------------------------------------------------------------
+    UnloadFont(font);
     CloseWindow();                  // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
@@ -189,8 +196,28 @@ static void UpdatePositions(void)
 
 static void DrawPlanets(void)
 {
-    //printf("%f\n", pixelPerMeter);
+            time += GetFrameTime() * timeScale;
+
+        printf("%f\n", pixelPerMeter);
+
+    Vector2 tp = {10, 20};
+
+    char st[150] = {0};
+
+    //sprintf(st,
+      //  "time = %3.1f day\t\t pixelPermeter = %2.3e\n", time, pixelPerMeter);
+
+    //DrawTextEx(font, st,tp, (float)30, 3, GREEN);
+
     for(uint32_t i = 0u; i < 3; ++i) {
+        for(uint32_t k = 0u; k < PIX_TRAIL; k++)
+        {
+            Vector2 trScr = Vector2Scale(
+            Vector2Subtract(centerFOV, planets[i].trail[k]),
+            pixelPerMeter);
+            trScr = Vector2Add(trScr, screenCenter);
+            DrawPixelV(trScr, planets[i].color);
+        }
 
         Vector2 scr = Vector2Scale(
             Vector2Subtract(centerFOV, planets[i].position ),
@@ -207,27 +234,16 @@ static void DrawPlanets(void)
             planets[i].radius * pixelPerMeter,
             planets[i].color);
 
-        trail[tick%PIX_TRAIL] = planets[i].position;
+        planets[i].trail[tick%PIX_TRAIL] = planets[i].position;        
 
-        for(uint32_t k = 0u; k < PIX_TRAIL; k++)
-        {
-            Vector2 trScr = Vector2Scale(
-            Vector2Subtract(centerFOV, trail[k]),
-            pixelPerMeter);
-            DrawPixelV(trScr, GRAY);
-        }
-        
+        Vector2 deltaTextVector = {0,32};
+        tp = Vector2Add(tp, deltaTextVector);
 
-        char st[150];
+        //sprintf(st,
+        //    "\ni:%d\tx = %-2.2em\ty=%-2.2em\n", i, planets[i].position.x, planets[i].position.y);
+        //DrawTextEx(font, st,tp, (float)30, 3, GREEN);
+    }   
 
-        sprintf(st,
-            "\ni:%d\tx = %-2.2em\ty=%-2.2em\n", i, planets[i].position.x, planets[i].position.y);
-        
-        Vector2 tp = {10, 20+50*i};
-
-        //DrawText(st,10,20+50*i,20,GREEN);
-        DrawTextEx(font, st,tp, (float)35, 10, GREEN);
-    }
 }
 
 
