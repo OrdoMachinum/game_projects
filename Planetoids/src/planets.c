@@ -1,4 +1,4 @@
-#include "include/planets.h"
+#include "planets.h"
 
 struct planet planets[3] = {
     {   // Sun
@@ -8,7 +8,7 @@ struct planet planets[3] = {
         .position = ORIG_2,
         .summedForce = ORIG_2,
         .velocity = ORIG_2,
-        .color = YELLOW,
+        .color = ORANGE,
     },
     {   // EARTH
         .mass = M_EARTH,
@@ -41,3 +41,8 @@ struct planet planets[3] = {
         .color = RAYWHITE,
     }
  };
+
+ unsigned int getNumPlanets(void) 
+ {
+    return (unsigned int)(sizeof(planets) / sizeof(planets[0]));
+ }

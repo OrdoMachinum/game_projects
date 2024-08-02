@@ -19,6 +19,7 @@
 #define D_SUN_EARTH     (151.83e9f)
 #define D_EARTH_MOON    (384400e3f)
 
+#define GAMMA (6.674e-11f)
 
 #define ORIG_2  {0.f,   0.f}
 
@@ -33,7 +34,10 @@ struct planet {
     Vector2 *trail;
 };
 
-extern struct planet planets[3];
+extern struct planet planets[];
+
+unsigned int getNumPlanets(void);
+
 
 
 #endif
