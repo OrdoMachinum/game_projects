@@ -18,6 +18,8 @@ int main(void)
     float delTFrame = 0.f;
     currentView.screenCenter.x = screenWidth*0.5f;
     currentView.screenCenter.y = screenHeight*0.5f;
+    currentView.centerFOV = &(planets[0].position);
+    uint16_t iPlanet = 0u;
 
 
     printf("Number of planets : %u\n", getNumPlanets());
@@ -33,46 +35,39 @@ int main(void)
         
         // Update
         int key = GetKeyPressed();
+
+
         switch (key)
         {
-        case KEY_UP:
-            currentView.centerFOV.y -= planets[0].radius;
-            break;
-        case KEY_DOWN:
-            currentView.centerFOV.y +=  planets[0].radius;
-            break;
-        case KEY_LEFT:
-            currentView.centerFOV.x -=  planets[0].radius;
-            break;
-        case KEY_RIGHT:
-            currentView.centerFOV.x +=  planets[0].radius;
-            break;
+
         case KEY_A:
             planets[0].mass += 5e25;
             break;
         case KEY_Y:
             planets[0].mass -= 5e21;
             break;
-        case KEY_LEFT_SHIFT:
+        case KEY_KP_ADD:
             currentView.pixelPerMeter *= 1.1;
-            printf("pixelPerMeter:\t%e\n", currentView.pixelPerMeter);
+            break;
+        case KEY_KP_SUBTRACT:
+            currentView.pixelPerMeter *= 0.9;
+            break;
+        case KEY_LEFT_SHIFT:
+            currentView.pixelPerMeterPlanets *= 1.1;
             break;
         case KEY_LEFT_CONTROL:
-            currentView.pixelPerMeter *= 0.9;
-            printf("pixelPerMeter:\t%e\n", currentView.pixelPerMeter);
+            currentView.pixelPerMeterPlanets *= 0.9;
             break;
-        case KEY_SPACE:
-            currentView.centerFOV = planets[1].position;
+        case KEY_ENTER:
+            iPlanet = (iPlanet+1u)%getNumPlanets();
+            printf("%u planet\n",iPlanet);
+            currentView.centerFOV = &(planets[iPlanet].position);
             break;
         default:
             break;
         }
 
-        if(IsKeyDown(KEY_SPACE)){
-            currentView.centerFOV = planets[1].position;
-        } else {
-            currentView.centerFOV = planets[0].position;
-        }
+
 
         delTFrame = GetFrameTime() * timeScale;
 

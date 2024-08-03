@@ -6,9 +6,10 @@
 #include <raymath.h>
 
 struct view {
-    Vector2 centerFOV;
+    Vector2 * centerFOV;
     Vector2 screenCenter;
     float pixelPerMeter;
+    float pixelPerMeterPlanets;
 };
 
 extern struct view currentView;
