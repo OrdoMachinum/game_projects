@@ -41,10 +41,10 @@ int main(void)
         {
 
         case KEY_A:
-            planets[0].mass += 5e25;
+            planets[0].mass *= 1.2;
             break;
         case KEY_Y:
-            planets[0].mass -= 5e21;
+            planets[0].mass *= 0.8;
             break;
         case KEY_KP_ADD:
             currentView.pixelPerMeter *= 1.1;

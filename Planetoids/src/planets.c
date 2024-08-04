@@ -38,7 +38,7 @@ struct planet planets[] = {
             .x = V_EARTH - V_MOON,
             .y = 0.f
             },
-        .color = RAYWHITE,
+        .color = GRAY,
     },
     {   // Mercury
         .mass = M_MERCURY,
@@ -53,7 +53,7 @@ struct planet planets[] = {
             .x = V_MERCURY,
             .y = 0.f
             },        
-            .color = RAYWHITE,
+            .color = GRAY,
     },
     {   // Venus
         .mass = M_VENUS,
@@ -99,6 +99,66 @@ struct planet planets[] = {
             .y = 0.f
             },        
             .color = ORANGE,
+    },
+    {   // SATURN
+        .mass = M_SATURN,
+        .radius = R_SATURN,
+        .movable = true,
+        .position = {
+            .x = 0.f,
+            .y = D_SUN_SATURN,
+            },
+        .summedForce = ORIG_2,
+        .velocity = {
+            .x = V_SATURN,
+            .y = 0.f
+            },        
+            .color = GOLD,
+    },
+    {   // URANUS
+        .mass = M_URANUS,
+        .radius = R_URANUS,
+        .movable = true,
+        .position = {
+            .x = 0.f,
+            .y = D_SUN_URANUS,
+            },
+        .summedForce = ORIG_2,
+        .velocity = {
+            .x = V_URANUS,
+            .y = 0.f
+            },        
+            .color = BLUE,
+    },
+    {   // NEPTUNE
+        .mass = M_NEPTUNE,
+        .radius = R_NEPTUNE,
+        .movable = true,
+        .position = {
+            .x = 0.f,
+            .y = D_SUN_NEPTUNE,
+            },
+        .summedForce = ORIG_2,
+        .velocity = {
+            .x = V_NEPTUNE,
+            .y = 0.f
+            },        
+            .color = DARKBLUE,
+    },
+    {   // PLUTO
+        .mass = M_PLUTO,
+        .radius = R_PLUTO,
+        .movable = true,
+        .position = {
+            .x = 0.f,
+            .y = D_SUN_PLUTO,
+            },
+        .summedForce = ORIG_2,
+        .velocity = {
+            .x = V_PLUTO,
+            .y = 0.f
+            },        
+            .color = BROWN,
     },
  };
 

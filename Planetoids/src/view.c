@@ -14,6 +14,8 @@ void DrawPlanets(
 {
     for(uint32_t i = 0u; i < getNumPlanets(); ++i) {
 
+        const float r =  planets[i].radius * fov->pixelPerMeter < 1.f ? 1.f : planets[i].radius * fov->pixelPerMeter;
+
         Vector2 scr = Vector2Scale(
             Vector2Subtract(
             *(fov->centerFOV), bodies[i].position ),
@@ -23,7 +25,7 @@ void DrawPlanets(
         
         DrawCircleV(
             scr,
-            planets[i].radius * fov->pixelPerMeterPlanets,
+            r,
             planets[i].color);
     }   
 }
