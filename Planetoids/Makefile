@@ -1,7 +1,10 @@
 PROJECT = planets
 UNITS = view solsystem planets main
 
+
 CC = gcc
+#CC = /usr/bin/x86_64-w64-mingw32-gcc-win32 
+
 
 DEBUG_FLAGS ?= #-O0 -g
 

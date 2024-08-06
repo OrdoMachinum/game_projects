@@ -5,6 +5,8 @@
 #include "solsystem.h"
 #include <stdio.h>
 
+
+
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -15,16 +17,33 @@ int main(void)
     const int screenWidth = 1250;
     const int screenHeight = 1000;
     const float timeScale  = 24.f * 3600.f; // simulationTime[s] /  frameTime [s]
+    int fontSize = 20;
     float delTFrame = 0.f;
     currentView.screenCenter.x = screenWidth*0.5f;
     currentView.screenCenter.y = screenHeight*0.5f;
     currentView.centerFOV = &(planets[0].position);
-    uint16_t iPlanet = 0u;
+    uint16_t iPlanet = 0u;    
 
+    struct tracePoint trails[getNumPlanets()][TRAIL_LENGTH];
+    
 
     printf("Number of planets : %u\n", getNumPlanets());
 
+    for(uint16_t ip = 0u; ip < getNumPlanets(); ip++){
+       
+        for (uint16_t it = 0; it < TRAIL_LENGTH; it++){
+            trails[ip][it].position.x = 0.f;
+            trails[ip][it].position.y = 0.f;
+            trails[ip][it].alpha = 255.f;
+        }
+        
+        planets[ip].trail = trails[ip];
+
+        printf("trail %d addr: %X\n ", ip, planets[ip].trail);
+    }
+
     InitWindow(screenWidth, screenHeight, "Planetoids, refactored");
+    Font inFont = LoadFontEx("resources/Terminus.ttf",fontSize, NULL,0);
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
@@ -41,10 +60,12 @@ int main(void)
         {
 
         case KEY_A:
-            planets[0].mass *= 1.2;
+            planets[iPlanet].mass *= 1.2;
+            planets[iPlanet].radius *= 1.071;
             break;
         case KEY_Y:
-            planets[0].mass *= 0.8;
+            planets[iPlanet].mass *= 0.8;
+            planets[iPlanet].radius *= 0.91;
             break;
         case KEY_KP_ADD:
             currentView.pixelPerMeter *= 1.1;
@@ -60,7 +81,7 @@ int main(void)
             break;
         case KEY_ENTER:
             iPlanet = (iPlanet+1u)%getNumPlanets();
-            printf("%u planet\n",iPlanet);
+            //printf("%u planet\n",iPlanet);
             currentView.centerFOV = &(planets[iPlanet].position);
             break;
         default:
@@ -81,7 +102,26 @@ int main(void)
             ClearBackground(BLACK);
 
             DrawPlanets(&currentView, planets);
+
+            Vector2 textPos = {10,10};
+            char textBuff[LINE_LENGTH] = {0};
+
+            sprintf(textBuff, "Real time :\t%.1f day \t\t1 pixel = %2.1E km", GetTime(), 1e3f/ currentView.pixelPerMeter);
+            DrawTextEx(inFont, textBuff, textPos, fontSize, 1, RAYWHITE);
+            textPos.y = 10;
+            textBuff[0] = 0;
+
             
+            for(uint16_t pl = 0u; pl < getNumPlanets(); pl++){
+                //printf(" %c [%d] mass : %f kg \n", ((pl == iPlanet)? '>' : ' '), pl, planets[pl].mass) ;
+                textPos.x = screenWidth - 0.6*fontSize*sprintf(textBuff, "%c [%2d] mass : %3.3E kg", (pl == iPlanet)? '>' : ' ', pl, planets[pl].mass) ;
+                DrawTextEx(inFont, textBuff, textPos, fontSize, 1, planets[pl].color);
+                textPos.y += fontSize;
+            }
+
+            textPos.y = screenHeight - 4*fontSize;
+            textPos.x = 10;
+            DrawTextEx(inFont, " ENTER:\tchange planet\n a / y:\tincrease/decrease mass\n + / -:\tzoom in/out\n ", textPos, fontSize, 1, GRAY);
 
         EndDrawing();
         //----------------------------------------------------------------------------------

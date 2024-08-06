@@ -5,6 +5,8 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#define LINE_LENGTH (250)
+
 struct view {
     Vector2 * centerFOV;
     Vector2 screenCenter;

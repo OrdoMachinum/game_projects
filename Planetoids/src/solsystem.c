@@ -1,6 +1,6 @@
 #include"solsystem.h"
 
-
+static uint64_t tickNum = 0;
 
 static void Gravity(
     const Vector2 * const position,
@@ -54,6 +54,10 @@ void updateSystem(
 
         bodies[i].position = Vector2Add(bodies[i].position, Vector2Scale(bodies[i].velocity, deltaT));
 
+        bodies[i].trail[tickNum%TRAIL_LENGTH].position = bodies[i].position;
+        bodies[i].trail[tickNum%TRAIL_LENGTH].alpha = 255u;
+
         //printf("REA: %d:\tx=%.2f\ty=%.2f\n", i, planets[i].position.x, planets[i].position.y);
     }
+    tickNum++;
 }
