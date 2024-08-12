@@ -1,6 +1,9 @@
 #include "planets.h"
 
-struct planet planets[] = {
+
+
+
+dtMassPoint planets[] = {
     {   // Sun
         .mass = M_SUN,
         .radius = R_SUN,
@@ -161,6 +164,8 @@ struct planet planets[] = {
             .color = BROWN,
     },
  };
+
+
 
  unsigned int getNumPlanets(void) 
  {

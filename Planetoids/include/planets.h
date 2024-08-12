@@ -4,6 +4,8 @@
 #include "raylib.h"
 #include <stdint.h>
 
+#define START_NUM           (10u)
+
 #define TRAIL_LENGTH        (2000u)
 
 #define M_SUN           (1.989e30f) // kg
@@ -57,12 +59,18 @@
 
 #define ORIG_2  {0.f,   0.f}
 
-struct tracePoint {
+typedef struct dtTrace_t {
     Vector2 position;
     float   alpha;
-};
+}dtTrace;
 
-struct planet {
+typedef struct dtPolar2_t {
+    float r;
+    float t;
+}dtPolar2;
+
+
+typedef struct dtPlanet_t{
     bool    movable;
     float   mass;
     Vector2 position;
@@ -70,12 +78,12 @@ struct planet {
     Vector2 summedForce;
     Color   color;
     float   radius;
-    struct tracePoint * trail;
-};
+    dtTrace * trail;
+}dtMassPoint;
 
+extern dtMassPoint planets[];
 
-
-extern struct planet planets[];
+extern dtMassPoint * bodies;
 
 unsigned int getNumPlanets(void);
 

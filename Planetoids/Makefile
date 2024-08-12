@@ -1,5 +1,5 @@
 PROJECT = planets
-UNITS = view solsystem planets main
+UNITS = view phyics planets main
 
 
 CC = gcc
@@ -8,7 +8,8 @@ CC = gcc
 
 DEBUG_FLAGS ?= #-O0 -g
 
-CFLAGS = -Wall -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 $(DEBUG_FLAGS)
+#CFLAGS = -Wall -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -lc $(DEBUG_FLAGS) --static
+CFLAGS = -Wall -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -lc $(DEBUG_FLAGS) --static
 
 OUT_EXTENSION = .out
 OBJDIR = obj

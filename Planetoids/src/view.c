@@ -4,14 +4,14 @@
 
 #define INDICATOR_RADIUS_PX (20)
 
-struct view currentView = {
+dtView dtViewcurrentView = {
     .pixelPerMeter = 3.e-9,
     .pixelPerMeterPlanets = 3.e-9,
     .centerFOV = 0,
     .screenCenter ={0.f, 0.f},
 };
 
-Vector2 toScreenCoord(const Vector2 * const realCoord, const struct view * const fov) 
+Vector2 toScreenCoord(const Vector2 * const realCoord, const dtView* const fov) 
 {
     return Vector2Add(fov->screenCenter, 
     Vector2Scale(
@@ -20,8 +20,8 @@ Vector2 toScreenCoord(const Vector2 * const realCoord, const struct view * const
 }
 
 void DrawPlanets(
-    const struct view * const fov,
-    const struct planet * const bodies)
+    const dtView* const fov,
+    const dtMassPoint * const bodies)
 {
     static unsigned int trailTick = 0u;
 
@@ -49,4 +49,13 @@ void DrawPlanets(
         }
     }
     trailTick = (trailTick+1) % TRAIL_LENGTH;
+
+}
+
+
+
+void printDats(FILE * const fp, const dtMassPoint * pl)
+{     
+    fprintf(fp, "%4.2e\n", kineticEnergy(pl) );
+    fflush(fp);
 }

@@ -4,6 +4,8 @@
         "planets.h": "c",
         "solsystem.h": "c",
         "view.h": "c",
-        "raymath.h": "c"
+        "raymath.h": "c",
+        "readbodies.h": "c",
+        "physics.h": "c"
     }
 }

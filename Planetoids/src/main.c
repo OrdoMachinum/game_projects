@@ -1,9 +1,14 @@
+#define _GNU_SOURCE
+#define _POSIX_SOURCE
+#define GNUPLOT "gnuplot -persist"
+
 #include "raylib.h"
 #include "planets.h"
 #include "raymath.h"
 #include "view.h"
-#include "solsystem.h"
+#include "physics.h"
 #include <stdio.h>
+
 
 
 
@@ -16,7 +21,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
     const int screenWidth = 1250;
     const int screenHeight = 1000;
-    const float timeScale  = 24.f * 3600.f; // simulationTime[s] /  frameTime [s]
+    float timeScale  = 24.f * 3600.f; // simulationTime[s] /  frameTime [s]
     int fontSize = 20;
     float delTFrame = 0.f;
     currentView.screenCenter.x = screenWidth*0.5f;
@@ -24,7 +29,14 @@ int main(void)
     currentView.centerFOV = &(planets[0].position);
     uint16_t iPlanet = 0u;    
 
-    struct tracePoint trails[getNumPlanets()][TRAIL_LENGTH];
+    dtTrace trails[getNumPlanets()][TRAIL_LENGTH];
+
+    FILE * fp = fopen("plot.dat", "w");
+    
+    if(!fp){
+        return -1;
+    }
+    
     
 
     printf("Number of planets : %u\n", getNumPlanets());
@@ -32,15 +44,16 @@ int main(void)
     for(uint16_t ip = 0u; ip < getNumPlanets(); ip++){
        
         for (uint16_t it = 0; it < TRAIL_LENGTH; it++){
-            trails[ip][it].position.x = 0.f;
-            trails[ip][it].position.y = 0.f;
+            trails[ip][it].position.x = NAN;
+            trails[ip][it].position.y = NAN;
             trails[ip][it].alpha = 255.f;
         }
         
         planets[ip].trail = trails[ip];
 
-        printf("trail %d addr: %X\n ", ip, planets[ip].trail);
+        printf("trail %d addr: %p\n ", ip, planets[ip].trail);
     }
+
 
     InitWindow(screenWidth, screenHeight, "Planetoids, refactored");
     Font inFont = LoadFontEx("resources/Terminus.ttf",fontSize, NULL,0);
@@ -74,10 +87,10 @@ int main(void)
             currentView.pixelPerMeter *= 0.9;
             break;
         case KEY_LEFT_SHIFT:
-            currentView.pixelPerMeterPlanets *= 1.1;
+            timeScale *= 1.1;
             break;
         case KEY_LEFT_CONTROL:
-            currentView.pixelPerMeterPlanets *= 0.9;
+            timeScale *= 0.9;
             break;
         case KEY_ENTER:
             iPlanet = (iPlanet+1u)%getNumPlanets();
@@ -101,7 +114,11 @@ int main(void)
 
             ClearBackground(BLACK);
 
+            DrawFPS(screenWidth-400, screenHeight-30);
+
+
             DrawPlanets(&currentView, planets);
+            printDats(fp, &planets[3]);
 
             Vector2 textPos = {10,10};
             char textBuff[LINE_LENGTH] = {0};
@@ -130,6 +147,7 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
+    fclose(fp);
     //--------------------------------------------------------------------------------------
 
     return 0;
