@@ -1,13 +1,11 @@
-#define _GNU_SOURCE
-#define _POSIX_SOURCE
-#define GNUPLOT "gnuplot -persist"
+//#define _GNU_SOURCE
+#include <stdio.h>
 
 #include "raylib.h"
 #include "planets.h"
 #include "raymath.h"
 #include "view.h"
 #include "physics.h"
-#include <stdio.h>
 
 
 

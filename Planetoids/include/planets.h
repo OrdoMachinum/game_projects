@@ -1,8 +1,8 @@
 #ifndef PLANETS_H
 #define PLANETS_H
 
-#include "raylib.h"
 #include <stdint.h>
+#include <raylib.h>
 
 #define START_NUM           (10u)
 

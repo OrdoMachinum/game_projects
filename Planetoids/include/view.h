@@ -1,11 +1,14 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include "planets.h"
-#include "physics.h"
+#include <stdio.h>
+
 #include <raylib.h>
 #include <raymath.h>
-#include<stdio.h>
+
+#include "planets.h"
+#include "physics.h"
+
 
 #define LINE_LENGTH (250)
 

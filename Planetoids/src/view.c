@@ -1,10 +1,9 @@
 #include "view.h"
 
-#include <stdio.h>
 
 #define INDICATOR_RADIUS_PX (20)
 
-dtView dtViewcurrentView = {
+dtView currentView = {
     .pixelPerMeter = 3.e-9,
     .pixelPerMeterPlanets = 3.e-9,
     .centerFOV = 0,

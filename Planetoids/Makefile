@@ -9,7 +9,7 @@ CC = gcc
 DEBUG_FLAGS ?= #-O0 -g
 
 #CFLAGS = -Wall -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -lc $(DEBUG_FLAGS) --static
-CFLAGS = -Wall -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -lc $(DEBUG_FLAGS) --static
+CFLAGS = -Wall -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -lc $(DEBUG_FLAGS)
 
 OUT_EXTENSION = .out
 OBJDIR = obj
