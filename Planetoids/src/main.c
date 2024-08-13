@@ -1,4 +1,4 @@
-//#define _GNU_SOURCE
+#define _GNU_SOURCE
 #include <stdio.h>
 
 #include "raylib.h"
@@ -37,7 +37,7 @@ int main(void)
     
     
 
-    printf("Number of planets : %u\n", getNumPlanets());
+    printf("Number of bodies : %u\n", getNumPlanets());
 
     for(uint16_t ip = 0u; ip < getNumPlanets(); ip++){
        
@@ -112,7 +112,7 @@ int main(void)
 
             ClearBackground(BLACK);
 
-            DrawFPS(screenWidth-400, screenHeight-30);
+            DrawFPS(screenWidth-10*fontSize, screenHeight-30);
 
 
             DrawPlanets(&currentView, planets);

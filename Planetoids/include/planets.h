@@ -1,6 +1,6 @@
 #ifndef PLANETS_H
 #define PLANETS_H
-
+#define _GNU_SOURCE
 #include <stdint.h>
 #include <raylib.h>
 
