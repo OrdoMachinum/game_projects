@@ -5,6 +5,7 @@
 #include <raylib.h>
 
 #define START_NUM           (10u)
+#define SYS_INCREMENT       (40u)
 
 #define TRAIL_LENGTH        (2000u)
 
@@ -71,6 +72,7 @@ typedef struct dtPolar2_t {
 
 
 typedef struct dtPlanet_t{
+    bool    simulate;
     bool    movable;
     float   mass;
     Vector2 position;
@@ -83,7 +85,12 @@ typedef struct dtPlanet_t{
 
 extern dtMassPoint planets[];
 
-extern dtMassPoint * bodies;
+extern dtMassPoint * pBodies = NULL;
+
+extern void initSystem(void);
+extern void addBody(const dtMassPoint * const pBody);
+extern void destroySystem(void);
+
 
 unsigned int getNumPlanets(void);
 
