@@ -29,7 +29,7 @@ int main(void)
 
     dtTrace trails[getNumPlanets()][TRAIL_LENGTH];
 
-    FILE * fp = fopen("plot.dat", "w");
+    FILE * fp = fopen("plot.csv", "w");
     
     if(!fp){
         return -1;
@@ -112,7 +112,7 @@ int main(void)
 
             ClearBackground(BLACK);
 
-            DrawFPS(screenWidth-10*fontSize, screenHeight-30);
+            DrawFPS(screenWidth-6*fontSize, screenHeight-30);
 
 
             DrawPlanets(&currentView, planets);
