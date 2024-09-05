@@ -2,7 +2,13 @@
 #define PLANETS_H
 #define _GNU_SOURCE
 #include <stdint.h>
+#include <stdlib.h>
 #include <raylib.h>
+#include <string.h>
+#include <stdio.h>
+#include <math.h>
+
+#include "errorID.h"
 
 #define START_NUM           (10u)
 #define SYS_INCREMENT       (40u)
@@ -72,6 +78,8 @@ typedef struct dtPolar2_t {
 
 
 typedef struct dtPlanet_t{
+    unsigned long int ID;
+    char * name;
     bool    simulate;
     bool    movable;
     float   mass;
@@ -83,14 +91,16 @@ typedef struct dtPlanet_t{
     dtTrace * trail;
 }dtMassPoint;
 
+
 extern dtMassPoint planets[];
 
-extern dtMassPoint * pBodies = NULL;
+extern dtMassPoint ** ppBodies;
 
-extern void initSystem(void);
-extern void addBody(const dtMassPoint * const pBody);
-extern void destroySystem(void);
+dtErrorID initSystem(void);
+dtErrorID addBody(const dtMassPoint * const pBody);
+dtErrorID destroySystem(void);
 
+dtErrorID readSystemFromFile(const char * const fName, const char * delimiter);
 
 unsigned int getNumPlanets(void);
 

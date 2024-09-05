@@ -25,30 +25,32 @@ void DrawPlanets(
     static unsigned int trailTick = 0u;
 
     for(uint32_t i = 0u; i < getNumPlanets(); ++i) {
-        Vector2 scr = toScreenCoord(&(bodies[i].position), fov);
+        
+        dtMassPoint * pB = bodies + i;
 
-        if(bodies[i].radius * fov->pixelPerMeter < 1.f ) {
-            Color cl = bodies[i].color;
+        Vector2 scr = toScreenCoord(&(pB->position), fov);
+
+        if(pB->radius * fov->pixelPerMeter < 1.f ) {
+            Color cl = pB->color;
             DrawPixelV(scr, cl);
             cl.a *= 0.3;
             DrawCircleLinesV(scr, INDICATOR_RADIUS_PX, cl);
         } else {
-            DrawCircleV(scr, (bodies[i].radius * fov->pixelPerMeter), bodies[i].color);
+            DrawCircleV(scr, (pB->radius * fov->pixelPerMeter), pB->color);
         }
                
 
-        if(NULL != bodies[i].trail) {
+        if(NULL != pB->trail) {
             for (uint16_t tr = 0u; tr < TRAIL_LENGTH; tr++) {
-                Color traceColor = bodies[i].color;
-                traceColor.a = (unsigned char)bodies[i].trail[tr].alpha;
-                scr = toScreenCoord(&(bodies[i].trail[tr].position), fov);
+                Color traceColor = pB->color;
+                traceColor.a = (unsigned char)pB->trail[tr].alpha;
+                scr = toScreenCoord(&(pB->trail[tr].position), fov);
                 DrawPixelV(scr, traceColor);
-                bodies[i].trail[tr].alpha -= 255.f/TRAIL_LENGTH;
+                pB->trail[tr].alpha -= 255.f/TRAIL_LENGTH;
             }
         }
     }
     trailTick = (trailTick+1) % TRAIL_LENGTH;
-
 }
 
 

@@ -15,14 +15,17 @@ static void Gravity(
     field->x = 0.f;
     field->y = 0.f;
     for(uint32_t i = 0u; i < getNumPlanets(); i++){
-        if(Vector2Equals(bodies[i].position, *position )){
+
+        dtMassPoint * pB = bodies + i;
+
+        if(Vector2Equals(pB->position, *position )){
             continue;
         }
-        Vector2 relVec = Vector2Subtract(*position, bodies[i].position);
+        Vector2 relVec = Vector2Subtract(*position, pB->position);
         Vector2 iForce =  Vector2Normalize (relVec);
 
         iForce = Vector2Scale(iForce,
-            (-GAMMA*bodies[i].mass/Vector2DistanceSqr(*position, bodies[i].position )) );
+            (-GAMMA * pB->mass/Vector2DistanceSqr(*position, pB->position )) );
 
         *field = Vector2Add(*field, iForce);
     }
@@ -33,12 +36,14 @@ void Newton2(
     dtMassPoint * const bodies) 
 {
     for(uint32_t i = 0u; i < getNumPlanets(); i++) {
-        if(!bodies[i].movable) {
+        dtMassPoint * pB = bodies + i;
+
+        if(!pB->movable) {
             continue;
         }
         Vector2 field;
-        Gravity(&bodies[i].position, bodies, &field);
-        bodies[i].velocity = Vector2Add(bodies[i].velocity, Vector2Scale(field, deltaT));
+        Gravity(&pB->position, bodies, &field);
+        pB->velocity = Vector2Add(pB->velocity, Vector2Scale(field, deltaT));
     }   
 }
 
@@ -47,13 +52,14 @@ void updateSystem(
     dtMassPoint * const bodies)
 {
     for(uint32_t i = 0u; i < getNumPlanets() ; i++) {
-        if(!bodies[i].movable) {
+        dtMassPoint * pB = bodies + i;
+        if(!pB->movable) {
             continue;
         }
-        bodies[i].position = Vector2Add(bodies[i].position, Vector2Scale(bodies[i].velocity, deltaT));
+        pB->position = Vector2Add(pB->position, Vector2Scale(pB->velocity, deltaT));
         
-        bodies[i].trail[tickNum%TRAIL_LENGTH].position = bodies[i].position;
-        bodies[i].trail[tickNum%TRAIL_LENGTH].alpha = 255u;
+        pB->trail[tickNum%TRAIL_LENGTH].position = pB->position;
+        pB->trail[tickNum%TRAIL_LENGTH].alpha = 255u;
     }
     tickNum++;
 }

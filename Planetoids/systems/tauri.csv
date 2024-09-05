@@ -1,4 +1,4 @@
-Planet name;mass in kg;mean radius (km);mean distance from the Sun (million km);mean velocity (km/s);phases relative to Earth (degrees)
+#Planet name;mass in kg;mean radius (km);mean distance from the Sun (million km);mean velocity (km/s);phases relative to Earth (degrees)
 Sun;1.989e30;695700;0;0;0
 Mercury;3.3011e23;2439.7;57.91;47.87;45
 Venus;4.8675e24;6051.8;108.2;35.02;135

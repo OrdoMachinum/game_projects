@@ -29,7 +29,7 @@ int main(void)
 
     dtTrace trails[getNumPlanets()][TRAIL_LENGTH];
 
-    FILE * fp = fopen("plot.csv", "w");
+    FILE * fp = fopen("output/plot.csv", "w");
     
     if(!fp){
         return -1;
