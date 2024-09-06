@@ -1,6 +1,8 @@
 #ifndef PLANETS_H
 #define PLANETS_H
+
 #define _GNU_SOURCE
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <raylib.h>
@@ -10,10 +12,11 @@
 
 #include "errorID.h"
 
-#define START_NUM           (10u)
 #define SYS_INCREMENT       (40u)
+#define MAXNAME_LENGTH      (35)
 
 #define TRAIL_LENGTH        (2000u)
+#define TRAIL_MAX_ALPHA        (60)
 
 #define M_SUN           (1.989e30f) // kg
 #define M_EARTH           (6.0e24f) // kg
@@ -25,7 +28,7 @@
 #define M_SATURN       (5.6834e26f) // kg
 #define M_URANUS       (8.6810e25f) // kg
 #define M_NEPTUNE     (1.02409e26f) // kg
-#define M_PLUTO        (1.3025e22f) //kg
+#define M_PLUTO        (1.3025e22f) // kg
 
 #define R_SUN         (696340.0e3f) // m
 #define R_EARTH         (6371.0e3f) // m
@@ -79,7 +82,7 @@ typedef struct dtPolar2_t {
 
 typedef struct dtPlanet_t{
     unsigned long int ID;
-    char * name;
+    char    name[MAXNAME_LENGTH];
     bool    simulate;
     bool    movable;
     float   mass;
@@ -90,9 +93,6 @@ typedef struct dtPlanet_t{
     float   radius;
     dtTrace * trail;
 }dtMassPoint;
-
-
-extern dtMassPoint planets[];
 
 extern dtMassPoint ** ppBodies;
 

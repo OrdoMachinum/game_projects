@@ -19,14 +19,13 @@ Vector2 toScreenCoord(const Vector2 * const realCoord, const dtView* const fov)
 }
 
 void DrawPlanets(
-    const dtView* const fov,
-    const dtMassPoint * const bodies)
+    const dtView* const fov)
 {
     static unsigned int trailTick = 0u;
 
     for(uint32_t i = 0u; i < getNumPlanets(); ++i) {
         
-        dtMassPoint * pB = bodies + i;
+        dtMassPoint * pB = *(ppBodies + i);
 
         Vector2 scr = toScreenCoord(&(pB->position), fov);
 
@@ -46,7 +45,8 @@ void DrawPlanets(
                 traceColor.a = (unsigned char)pB->trail[tr].alpha;
                 scr = toScreenCoord(&(pB->trail[tr].position), fov);
                 DrawPixelV(scr, traceColor);
-                pB->trail[tr].alpha -= 255.f/TRAIL_LENGTH;
+                /* The float conversion here is really important, if we want a working fade effect. */
+                pB->trail[tr].alpha -= ((float)TRAIL_MAX_ALPHA)/TRAIL_LENGTH; 
             }
         }
     }

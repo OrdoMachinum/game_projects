@@ -8,8 +8,6 @@
 #include "physics.h"
 
 
-
-
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -17,6 +15,7 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
+    unsigned long err = NO_ERROR;
     const int screenWidth = 1250;
     const int screenHeight = 1000;
     float timeScale  = 24.f * 3600.f; // simulationTime[s] /  frameTime [s]
@@ -24,36 +23,25 @@ int main(void)
     float delTFrame = 0.f;
     currentView.screenCenter.x = screenWidth*0.5f;
     currentView.screenCenter.y = screenHeight*0.5f;
-    currentView.centerFOV = &(planets[0].position);
+    currentView.centerFOV = NULL;
+    
     uint16_t iPlanet = 0u;    
 
-    dtTrace trails[getNumPlanets()][TRAIL_LENGTH];
-
-    FILE * fp = fopen("output/plot.csv", "w");
-    
-    if(!fp){
-        return -1;
+    err = initSystem();
+    if(err) {
+        return err;
     }
-    
-    
+
+    err = readSystemFromFile("systems/tauri.csv", ";");
+    if(err) {
+        return err;
+    }
+    currentView.centerFOV = &(ppBodies[0]->position);
 
     printf("Number of bodies : %u\n", getNumPlanets());
 
-    for(uint16_t ip = 0u; ip < getNumPlanets(); ip++){
-       
-        for (uint16_t it = 0; it < TRAIL_LENGTH; it++){
-            trails[ip][it].position.x = NAN;
-            trails[ip][it].position.y = NAN;
-            trails[ip][it].alpha = 255.f;
-        }
-        
-        planets[ip].trail = trails[ip];
-
-        printf("trail %d addr: %p\n ", ip, planets[ip].trail);
-    }
-
-
     InitWindow(screenWidth, screenHeight, "Planetoids, refactored");
+
     Font inFont = LoadFontEx("resources/Terminus.ttf",fontSize, NULL,0);
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
@@ -66,18 +54,8 @@ int main(void)
         // Update
         int key = GetKeyPressed();
 
-
         switch (key)
         {
-
-        case KEY_A:
-            planets[iPlanet].mass *= 1.2;
-            planets[iPlanet].radius *= 1.071;
-            break;
-        case KEY_Y:
-            planets[iPlanet].mass *= 0.8;
-            planets[iPlanet].radius *= 0.91;
-            break;
         case KEY_KP_ADD:
             currentView.pixelPerMeter *= 1.1;
             break;
@@ -92,19 +70,16 @@ int main(void)
             break;
         case KEY_ENTER:
             iPlanet = (iPlanet+1u)%getNumPlanets();
-            //printf("%u planet\n",iPlanet);
-            currentView.centerFOV = &(planets[iPlanet].position);
+            currentView.centerFOV = &(ppBodies[iPlanet]->position);
             break;
         default:
             break;
         }
 
-
-
         delTFrame = GetFrameTime() * timeScale;
 
-        Newton2(delTFrame, planets);
-        updateSystem(delTFrame, planets);
+        Newton2(delTFrame);
+        updateSystem(delTFrame);
 
         // Draw
         //----------------------------------------------------------------------------------
@@ -114,9 +89,7 @@ int main(void)
 
             DrawFPS(screenWidth-6*fontSize, screenHeight-30);
 
-
-            DrawPlanets(&currentView, planets);
-            printDats(fp, &planets[3]);
+            DrawPlanets(&currentView);
 
             Vector2 textPos = {10,10};
             char textBuff[LINE_LENGTH] = {0};
@@ -128,9 +101,9 @@ int main(void)
 
             
             for(uint16_t pl = 0u; pl < getNumPlanets(); pl++){
-                //printf(" %c [%d] mass : %f kg \n", ((pl == iPlanet)? '>' : ' '), pl, planets[pl].mass) ;
-                textPos.x = screenWidth - 0.6*fontSize*sprintf(textBuff, "%c [%2d] mass : %3.3E kg", (pl == iPlanet)? '>' : ' ', pl, planets[pl].mass) ;
-                DrawTextEx(inFont, textBuff, textPos, fontSize, 1, planets[pl].color);
+                dtMassPoint * pB = ppBodies[pl];
+                textPos.x = screenWidth - 0.6*fontSize*sprintf(textBuff, "%c [%2d] mass : %3.3E kg", (pl == iPlanet)? '>' : ' ', pl, pB->mass) ;
+                DrawTextEx(inFont, textBuff, textPos, fontSize, 1, pB->color);
                 textPos.y += fontSize;
             }
 
@@ -145,8 +118,8 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
-    fclose(fp);
     //--------------------------------------------------------------------------------------
 
-    return 0;
+    err = destroySystem();
+    return err;
 }

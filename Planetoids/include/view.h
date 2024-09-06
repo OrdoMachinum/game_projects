@@ -22,7 +22,7 @@ typedef struct dtView_tag{
 extern dtView currentView;
 
 
-void DrawPlanets(const dtView* const fov, const dtMassPoint * const bodies);
+void DrawPlanets(const dtView* const fov);
 
 void printDats(FILE * const gp, const dtMassPoint * pl);
 

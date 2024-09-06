@@ -7,8 +7,8 @@
 #include <raymath.h>
 
 
-void updateSystem(const float deltaTs, dtMassPoint * const bodies);
-void Newton2(const float deltaTs, dtMassPoint * const bodies);
+void updateSystem(const float deltaTs);
+void Newton2(const float deltaTs);
 float kineticEnergy (const dtMassPoint * const body);
 
 

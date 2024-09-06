@@ -6,6 +6,8 @@
         "view.h": "c",
         "raymath.h": "c",
         "readbodies.h": "c",
-        "physics.h": "c"
+        "physics.h": "c",
+        "errno.h": "c",
+        "features.h": "c"
     }
 }
