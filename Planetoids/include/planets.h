@@ -5,10 +5,12 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <raylib.h>
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+
+#include <raylib.h>
+#include <raymath.h>
 
 #include "errorID.h"
 
@@ -101,6 +103,17 @@ dtErrorID addBody(const dtMassPoint * const pBody);
 dtErrorID destroySystem(void);
 
 dtErrorID readSystemFromFile(const char * const fName, const char * delimiter);
+
+dtMassPoint ** createRingOfBalls(
+    const Vector2 center,
+    const float radiusOfCircle,
+    const float radiusOfBall,
+    const float mass,
+    const unsigned int num);
+
+dtPolar2 convToPolar2(const Vector2 * const cartesian);
+Vector2 convToCartesian2(const dtPolar2 * const polar);
+
 
 unsigned int getNumPlanets(void);
 

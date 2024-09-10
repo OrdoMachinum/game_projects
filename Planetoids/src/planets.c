@@ -17,6 +17,26 @@ dtMassPoint ** ppBodies = NULL;
  }
 
 
+dtPolar2 convToPolar2(const Vector2 * const cartesian)
+{
+    dtPolar2 ret = {
+        .r = Vector2Length(*cartesian),
+        .t = RAD2DEG*atanf(cartesian->y / cartesian->x)
+    };
+    return ret;
+}
+
+Vector2 convToCartesian2(const dtPolar2 * const polar)
+{
+    Vector2 ret = {
+        .x = polar->r * cosf32(DEG2RAD*polar->t),
+        .y = polar->r * sinf32(DEG2RAD*polar->t),
+    };
+    return ret;
+}
+
+
+
 dtErrorID initSystem(void)
 {
     if (ppBodies) {
@@ -153,4 +173,35 @@ dtErrorID readSystemFromFile(const char * const fName, const char* delimiter)
 
     fclose(fp);
     return err;
+}
+
+
+dtMassPoint ** createRingOfBalls(
+    const Vector2 center,
+    const float radiusOfCircle,
+    const float radiusOfBall,
+    const float mass,
+    const unsigned int num)
+{
+    dtMassPoint ** ppFirstBody = (ppBodies+numberOfBodies);
+    float delTheta = 360.f / num;
+
+    for (size_t i = 0; i < num; i++) {
+        dtMassPoint tempMass = {0};
+        dtPolar2 tempPol = {
+            .r = radiusOfCircle,
+            .t = i * delTheta
+        };
+        Vector2 tempCart = Vector2Add(center, convToCartesian2(&tempPol));
+
+        tempMass.mass = mass;
+        tempMass.movable = true;
+        tempMass.position.x = tempCart.x;
+        tempMass.position.y = tempCart.y;
+        tempMass.radius = radiusOfBall;
+        tempMass.color = RED;
+
+        addBody(&tempMass);
+    }
+    return ppFirstBody;
 }

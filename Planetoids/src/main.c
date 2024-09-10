@@ -36,6 +36,9 @@ int main(void)
     if(err) {
         return err;
     }
+
+    //createRingOfBalls(D_SUN_MERCURY, R_JUPITER,M_JUPITER,14u);
+
     currentView.centerFOV = &(ppBodies[0]->position);
 
     printf("Number of bodies : %u\n", getNumPlanets());
