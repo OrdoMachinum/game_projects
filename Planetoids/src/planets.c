@@ -29,8 +29,8 @@ dtPolar2 convToPolar2(const Vector2 * const cartesian)
 Vector2 convToCartesian2(const dtPolar2 * const polar)
 {
     Vector2 ret = {
-        .x = polar->r * cosf32(DEG2RAD*polar->t),
-        .y = polar->r * sinf32(DEG2RAD*polar->t),
+        .x = polar->r * cosf(DEG2RAD*polar->t),
+        .y = polar->r * sinf(DEG2RAD*polar->t),
     };
     return ret;
 }
@@ -122,7 +122,24 @@ dtErrorID destroySystem(void)
     return NO_ERROR;
 }
 
-static dtErrorID lineToMassPoint (char * line, dtMassPoint * const pmP, const char* delimiter) 
+
+
+static dtErrorID massPointToLine (
+    char * line,
+    const dtMassPoint * const pmP,
+    const char * delimiter)
+{
+    return NO_ERROR;
+
+}
+
+/**
+    Converting a string line to pmP dtMassPoint with delimiter
+ */
+static dtErrorID lineToMassPoint (
+    char * line,
+    dtMassPoint * const pmP,
+    const char* delimiter) 
 {
     char * currWord = strtok(line,delimiter);
     strcpy(pmP->name, currWord);

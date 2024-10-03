@@ -25,11 +25,13 @@ int main(void)
     currentView.screenCenter.y = screenHeight*0.5f;
     currentView.centerFOV = NULL;
     
-    uint16_t iPlanet = 0u;    
+    uint16_t iPlanet = 0u;
+    
 
     err = initSystem();
     if(err) {
         return err;
+        
     }
 
     err = readSystemFromFile("systems/tauri.csv", ";");
