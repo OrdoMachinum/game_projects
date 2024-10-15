@@ -38,6 +38,7 @@ int main(void)
     if(err) {
         return err;
     }
+    CalcInitEnergies();
 
     //createRingOfBalls(D_SUN_MERCURY, R_JUPITER,M_JUPITER,14u);
 
@@ -107,7 +108,12 @@ int main(void)
             
             for(uint16_t pl = 0u; pl < getNumPlanets(); pl++){
                 dtMassPoint * pB = ppBodies[pl];
-                textPos.x = screenWidth - 0.6*fontSize*sprintf(textBuff, "%c [%2d] mass : %3.3E kg", (pl == iPlanet)? '>' : ' ', pl, pB->mass) ;
+                textPos.x = screenWidth - 0.6*fontSize * 
+                        sprintf(textBuff, 
+                            "%c [%2d] mass : %3.3E kg\t energy error: %+3.1E %%",(pl == iPlanet)? '>' : ' ',
+                            pl, 
+                            pB->mass,
+                            100.f*(pB->initialEnergy - EnergySum(pB))/pB->initialEnergy);
                 DrawTextEx(inFont, textBuff, textPos, fontSize, 1, pB->color);
                 textPos.y += fontSize;
             }

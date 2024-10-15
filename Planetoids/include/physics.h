@@ -9,7 +9,11 @@
 
 void updateSystem(const float deltaTs);
 void Newton2(const float deltaTs);
-float kineticEnergy (const dtMassPoint * const body);
+float KineticEnergy (const dtMassPoint * const body);
+float GravPot(const Vector2 * const position);
+float EnergySum(const dtMassPoint * const body);
+
+void CalcInitEnergies(void);
 
 
 #endif

@@ -2,6 +2,7 @@
 #include <errno.h>
 
 #define MAX_COLUMN_IN_FILE (1024)
+#define OUTFIELD_WITH (64)
 #define COMMENT_CHAR       '#'
 #define IN_DELIM       ';'
 
@@ -129,8 +130,27 @@ static dtErrorID massPointToLine (
     const dtMassPoint * const pmP,
     const char * delimiter)
 {
-    return NO_ERROR;
+    dtPolar2 outPosition = convToPolar2(&(pmP->position));
+    dtPolar2 outVelocity = convToPolar2(&(pmP->velocity));
 
+    sprintf(line,
+        "%s%s"  /*  Name */ 
+        "%e%s"  /*  Mass, kg*/
+        "%e%s"  /*  Radius, km */
+        "%e%s"  /*  Radial Position million, km */
+        "%e%s"  /*  Solar Phase, deg */
+        "%e%s"  /*  Velocity km/s */
+        "%e%s",  /*  Velocity Direction, deg */
+        pmP->name, delimiter,
+        pmP->mass, delimiter,
+        (pmP->radius/SCALE_RADIUS), delimiter,
+        (outPosition.r/SCALE_POSITION), delimiter,
+        outPosition.t, delimiter,
+        (outVelocity.r/SCALE_VELOCITY), delimiter,
+        outVelocity.t, delimiter
+        );
+        
+    return NO_ERROR;
 }
 
 /**
@@ -141,6 +161,9 @@ static dtErrorID lineToMassPoint (
     dtMassPoint * const pmP,
     const char* delimiter) 
 {
+    dtPolar2 polarPosition = {0,0};
+    dtPolar2 polarVelocity = {0,0};
+    Vector2  cartesianTemp = {0,0};
     char * currWord = strtok(line,delimiter);
     strcpy(pmP->name, currWord);
     pmP->name[MAXNAME_LENGTH-1] = 0;
@@ -149,15 +172,28 @@ static dtErrorID lineToMassPoint (
     pmP->mass = atof(currWord);
 
     currWord = strtok(NULL,delimiter);
-    pmP->radius = atof(currWord)*1e3f;
+    pmP->radius = atof(currWord) * SCALE_RADIUS;
     
     currWord = strtok(NULL,delimiter);
-    pmP->position.y = atof(currWord) * 1e9f;
-    pmP->position.x = 0.f;
+    polarPosition.r = atof(currWord) * SCALE_POSITION;
+
+    currWord = strtok(NULL,delimiter);
+    polarPosition.t = atof(currWord);
+
+    currWord = strtok(NULL,delimiter);
+    polarVelocity.r = atof(currWord) * SCALE_VELOCITY;
     
     currWord = strtok(NULL,delimiter);
-    pmP->velocity.x = atof(currWord) * 1e3f;
-    pmP->velocity.y = 0.f;
+    polarVelocity.t = atof(currWord);
+
+    cartesianTemp = convToCartesian2(&polarPosition);
+    pmP->position.x = cartesianTemp.x;
+    pmP->position.y = cartesianTemp.y;
+
+    cartesianTemp = convToCartesian2(&polarVelocity);
+    pmP->velocity.x = cartesianTemp.x;
+    pmP->velocity.y = cartesianTemp.y;
+
     
     return NO_ERROR;
 }

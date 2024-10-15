@@ -12,7 +12,7 @@ $(info Building for linux...)
 CC = gcc
 OUT_EXTENSION = .out
 OBJDIR = obj
-OUT_DIR = bin/linux/
+OUT_DIR = bin/linux
 LDLIBS = -lGL -lc -lm -lpthread -ldl -lrt
 CFLAGS = -Wall -lraylib $(LDLIBS) -lX11 -lc $(DEBUG_FLAGS)
 else
@@ -28,6 +28,9 @@ endif
 
 INCLUDE_DIR = include
 SOURCE_DIR	= src
+
+run: all
+	./$(OUT_DIR)/$(PROJECT)$(OUT_EXTENSION)
 
 all: $(OBJECTS)
 	mkdir -p $(OUT_DIR)

@@ -2,9 +2,45 @@
 
 static uint64_t tickNum = 0;
 
-float kineticEnergy (const dtMassPoint * const body) 
+void CalcInitEnergies(void) 
+{
+    static bool inited = false;
+    if(!inited) {
+        for(uint32_t j = 0u; j < getNumPlanets(); j++){
+            dtMassPoint * pB = *(ppBodies + j);
+            pB->initialEnergy = EnergySum(pB);
+        }
+        inited = true;
+    }
+}
+
+float EnergySum(const dtMassPoint * const body) 
+{
+    return KineticEnergy(body) + body->mass * GravPot(&body->position);
+}
+
+float KineticEnergy (const dtMassPoint * const body) 
 {
     return 0.5f * Vector2LengthSqr(body->velocity) * body->mass;
+}
+
+float GravPot (
+    const Vector2 * const position) 
+{
+    float potential = 0.f;
+    for(uint32_t j = 0u; j < getNumPlanets(); j++){
+
+        dtMassPoint * pB = *(ppBodies + j);
+
+        if(Vector2Equals(pB->position, *position )){
+            continue;
+        }
+        float r_ij = Vector2Distance(*position, pB->position);
+
+        potential += (-GAMMA * pB->mass/r_ij);
+    }
+
+    return potential;
 }
 
 static void Gravity(

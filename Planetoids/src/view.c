@@ -57,6 +57,6 @@ void DrawPlanets(
 
 void printDats(FILE * const fp, const dtMassPoint * pl)
 {     
-    fprintf(fp, "%4.2e\n", kineticEnergy(pl) );
+    fprintf(fp, "%4.2e\n", KineticEnergy(pl) );
     fflush(fp);
 }

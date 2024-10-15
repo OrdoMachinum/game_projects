@@ -36,6 +36,14 @@ output/
 *.i*86
 *.x86_64
 *.hex
+[dD]ebug/
+[rR]elease/
+[bB]in/
+
+# STM32CubeIDE
+.metadata/
+.settings/
+
 
 # Debug files
 *.dSYM/
