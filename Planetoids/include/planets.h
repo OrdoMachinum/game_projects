@@ -48,6 +48,7 @@ typedef struct dtPlanet_t{
     Vector2 position;
     Vector2 velocity;
     float   initialEnergy;
+    float   currentEnergy;
     Color   color;
     float   radius;
     dtTrace * trail;

@@ -1,6 +1,8 @@
 #include"physics.h"
 
 static uint64_t tickNum = 0;
+float sysFullEnergyInit = 0.f;
+float sysFullEnergy = 0.f;
 
 void CalcInitEnergies(void) 
 {
@@ -8,15 +10,29 @@ void CalcInitEnergies(void)
     if(!inited) {
         for(uint32_t j = 0u; j < getNumPlanets(); j++){
             dtMassPoint * pB = *(ppBodies + j);
-            pB->initialEnergy = EnergySum(pB);
+            updateEnergyOfBody(pB);
+            pB->initialEnergy = pB->currentEnergy;
+            sysFullEnergy += pB->currentEnergy;
         }
+        sysFullEnergyInit = sysFullEnergy;
         inited = true;
     }
 }
 
-float EnergySum(const dtMassPoint * const body) 
+
+void calcSysFullEnergy(void) 
 {
-    return KineticEnergy(body) + body->mass * GravPot(&body->position);
+    sysFullEnergy = 0.f;
+    for(uint32_t j = 0u; j < getNumPlanets(); j++){
+        dtMassPoint * pB = *(ppBodies + j);
+        updateEnergyOfBody(pB);
+        sysFullEnergy += pB->currentEnergy;
+    }
+}
+
+void updateEnergyOfBody(dtMassPoint * const body) 
+{
+    body->currentEnergy = KineticEnergy(body) + body->mass * GravPot(&body->position);
 }
 
 float KineticEnergy (const dtMassPoint * const body) 

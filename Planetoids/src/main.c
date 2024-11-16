@@ -7,6 +7,8 @@
 #include "view.h"
 #include "physics.h"
 
+#include <pthread.h>
+
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -27,6 +29,7 @@ int main(void)
     
     uint16_t iPlanet = 0u;
     
+       
 
     err = initSystem();
     if(err) {
@@ -59,6 +62,8 @@ int main(void)
         
         // Update
         int key = GetKeyPressed();
+        float mWheel = GetMouseWheelMove();
+        currentView.pixelPerMeter *= exp10(mWheel/100);
 
         switch (key)
         {
@@ -108,15 +113,26 @@ int main(void)
             
             for(uint16_t pl = 0u; pl < getNumPlanets(); pl++){
                 dtMassPoint * pB = ppBodies[pl];
+                updateEnergyOfBody(pB);
                 textPos.x = screenWidth - 0.6*fontSize * 
                         sprintf(textBuff, 
-                            "%c [%2d] mass : %3.3E kg\t energy error: %+3.1E %%",(pl == iPlanet)? '>' : ' ',
+                            "%c [%2d] mass : %3.3E kg\t DELTA-E: %+3.1E %%",(pl == iPlanet)? '>' : ' ',
                             pl, 
                             pB->mass,
-                            100.f*(pB->initialEnergy - EnergySum(pB))/pB->initialEnergy);
+                            100.f*(pB->initialEnergy - pB->currentEnergy)/pB->initialEnergy);
                 DrawTextEx(inFont, textBuff, textPos, fontSize, 1, pB->color);
                 textPos.y += fontSize;
             }
+
+            calcSysFullEnergy();
+
+            textPos.x = screenWidth - 0.6*fontSize * 
+                        sprintf(textBuff, 
+                            "\t DELTA-E: %+4.1E %%",
+                            100.f*(sysFullEnergyInit - sysFullEnergy)/sysFullEnergyInit);
+
+            DrawTextEx(inFont, textBuff, textPos, fontSize, 1, RED);
+
 
             textPos.y = screenHeight - 4*fontSize;
             textPos.x = 10;
