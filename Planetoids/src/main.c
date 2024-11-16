@@ -10,6 +10,8 @@
 #include <pthread.h>
 
 
+#define FPS     (60u)
+
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -20,21 +22,23 @@ int main(void)
     unsigned long err = NO_ERROR;
     const int screenWidth = 1250;
     const int screenHeight = 1000;
-    float timeScale  = 24.f * 3600.f; // simulationTime[s] /  frameTime [s]
-    int fontSize = 20;
-    float delTFrame = 0.f;
+    const float simScale  = 1.f * 3600.f; // [s]
+    //const float simScale  = 1.f * 3600.f; // [s]
+    float frameTimeScale = simScale * 24.f;
+    const int fontHeight = 20;
+    const int fontWidth  = fontHeight * 0.55f;
+    float delT = 0.f;
+    float scaledElapsedTime = 0.f;
     currentView.screenCenter.x = screenWidth*0.5f;
     currentView.screenCenter.y = screenHeight*0.5f;
     currentView.centerFOV = NULL;
     
     uint16_t iPlanet = 0u;
-    
-       
+         
 
     err = initSystem();
     if(err) {
-        return err;
-        
+        return err;        
     }
 
     err = readSystemFromFile("systems/tauri.csv", ";");
@@ -51,20 +55,24 @@ int main(void)
 
     InitWindow(screenWidth, screenHeight, "Planetoids, refactored");
 
-    Font inFont = LoadFontEx("resources/Terminus.ttf",fontSize, NULL,0);
+    Font inFont = LoadFontEx("resources/Terminus.ttf",fontHeight, NULL,0);
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+    SetTargetFPS(FPS);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        
-        // Update
+        float simFrameTime = 0.f;
+        // Collect Input
+        //----------------------------------------------------------------------------------
         int key = GetKeyPressed();
         float mWheel = GetMouseWheelMove();
-        currentView.pixelPerMeter *= exp10(mWheel/100);
-
+        
+        if(mWheel) {
+            currentView.pixelPerMeter *= exp10(mWheel/100);
+        }
+        
         switch (key)
         {
         case KEY_KP_ADD:
@@ -74,10 +82,10 @@ int main(void)
             currentView.pixelPerMeter *= 0.9;
             break;
         case KEY_LEFT_SHIFT:
-            timeScale *= 1.1;
+            frameTimeScale *= 1.1;
             break;
         case KEY_LEFT_CONTROL:
-            timeScale *= 0.9;
+            frameTimeScale *= 0.9;
             break;
         case KEY_ENTER:
             iPlanet = (iPlanet+1u)%getNumPlanets();
@@ -87,10 +95,19 @@ int main(void)
             break;
         }
 
-        delTFrame = GetFrameTime() * timeScale;
+        // Update Model
+        //----------------------------------------------------------------------------------
+        do{
+            delT = simScale / FPS;
+            simFrameTime += delT;
 
-        Newton2(delTFrame);
-        updateSystem(delTFrame);
+            Newton2(delT);
+            updateSystem(delT);
+        }while (simFrameTime < GetFrameTime() * frameTimeScale);
+
+        scaledElapsedTime += simFrameTime;
+ 
+        
 
         // Draw
         //----------------------------------------------------------------------------------
@@ -98,45 +115,54 @@ int main(void)
 
             ClearBackground(BLACK);
 
-            DrawFPS(screenWidth-6*fontSize, screenHeight-30);
+            DrawFPS(screenWidth-6*fontHeight, screenHeight-30);
 
             DrawPlanets(&currentView);
 
             Vector2 textPos = {10,10};
             char textBuff[LINE_LENGTH] = {0};
 
-            sprintf(textBuff, "Real time :\t%.1f day \t\t1 pixel = %2.1E km", GetTime(), 1e3f/ currentView.pixelPerMeter);
-            DrawTextEx(inFont, textBuff, textPos, fontSize, 1, RAYWHITE);
+            sprintf(textBuff, "Real time :\t%.1f day \t\t1 pixel = %2.1E km\nTime Step =\t%.1f s\nAnimation Speed =\t%3.1E week/frameSec. ",
+                    scaledElapsedTime/24/3600,
+                    1e3f/ currentView.pixelPerMeter,
+                    delT,
+                    frameTimeScale/7.f/24.f/3600.f);
+            DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, RAYWHITE);
+
+
             textPos.y = 10;
-            textBuff[0] = 0;
+
+            memset(textBuff, 0, LINE_LENGTH);
+            
 
             
             for(uint16_t pl = 0u; pl < getNumPlanets(); pl++){
+                textBuff[0] = 0;
                 dtMassPoint * pB = ppBodies[pl];
                 updateEnergyOfBody(pB);
-                textPos.x = screenWidth - 0.6*fontSize * 
+                textPos.x = screenWidth - fontWidth * ( 
                         sprintf(textBuff, 
                             "%c [%2d] mass : %3.3E kg\t DELTA-E: %+3.1E %%",(pl == iPlanet)? '>' : ' ',
                             pl, 
                             pB->mass,
-                            100.f*(pB->initialEnergy - pB->currentEnergy)/pB->initialEnergy);
-                DrawTextEx(inFont, textBuff, textPos, fontSize, 1, pB->color);
-                textPos.y += fontSize;
+                            100.f*(pB->initialEnergy - pB->currentEnergy)/pB->initialEnergy));
+                DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, pB->color);
+                textPos.y += fontHeight;
             }
 
             calcSysFullEnergy();
-
-            textPos.x = screenWidth - 0.6*fontSize * 
+            memset(textBuff, 0, LINE_LENGTH);
+            textPos.x = screenWidth - fontWidth *
                         sprintf(textBuff, 
-                            "\t DELTA-E: %+4.1E %%",
+                            "System DELTA-E: %+4.1E %%",
                             100.f*(sysFullEnergyInit - sysFullEnergy)/sysFullEnergyInit);
 
-            DrawTextEx(inFont, textBuff, textPos, fontSize, 1, RED);
+            DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, RED);
 
 
-            textPos.y = screenHeight - 4*fontSize;
+            textPos.y = screenHeight - 4*fontHeight;
             textPos.x = 10;
-            DrawTextEx(inFont, " ENTER:\tchange planet\n a / y:\tincrease/decrease mass\n + / -:\tzoom in/out\n ", textPos, fontSize, 1, GRAY);
+            DrawTextEx(inFont, " ENTER:\tchange planet\n left-SHIFT / left-CTRL:\tincrease/decrease animation speed\n + / -:\tzoom in/out\n ", textPos, fontHeight, 1, GRAY);
 
         EndDrawing();
         //----------------------------------------------------------------------------------
