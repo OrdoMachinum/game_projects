@@ -6,7 +6,7 @@
 dtView currentView = {
     .pixelPerMeter = 3.e-9,
     .pixelPerMeterPlanets = 3.e-9,
-    .centerFOV = 0,
+    .centerFOV = NULL,
     .screenCenter ={0.f, 0.f},
 };
 
@@ -16,6 +16,13 @@ Vector2 toScreenCoord(const Vector2 * const realCoord, const dtView* const fov)
     Vector2Scale(
                 Vector2Subtract( *(fov->centerFOV), *realCoord),
             fov->pixelPerMeter) );
+}
+
+Vector2 toRealCoord(const Vector2 * const screenCoord, const dtView* const fov) 
+{
+    Vector2 w = Vector2Scale( Vector2Subtract(*screenCoord, fov->screenCenter), 1.f/fov->pixelPerMeter) ;
+    w = Vector2Add(w, *(fov->centerFOV));
+    return w;
 }
 
 void DrawPlanets(

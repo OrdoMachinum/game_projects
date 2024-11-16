@@ -1,5 +1,15 @@
 #include"physics.h"
 
+typedef struct {
+    uint16_t iBodyStart; // Start index of calculation body in the case of multihreaded calculation 
+    uint16_t iBodyNumber; // How many body is considered in this thread
+    float   dTime;
+} dtPhysThread;
+
+
+pthread_t worker1;
+pthread_t worker2;
+
 static uint64_t tickNum = 0;
 float sysFullEnergyInit = 0.f;
 float sysFullEnergy = 0.f;
@@ -55,7 +65,6 @@ float GravPot (
 
         potential += (-GAMMA * pB->mass/r_ij);
     }
-
     return potential;
 }
 
@@ -92,19 +101,10 @@ void Newton2(
             continue;
         }
         Vector2 field;
-        Gravity(&pB->position, &field);
-        pB->velocity = Vector2Add(pB->velocity, Vector2Scale(field, deltaT));
-    }   
-}
 
-void updateSystem(
-    const float deltaT)
-{
-    for(uint32_t i = 0u; i < getNumPlanets() ; i++) {
-        dtMassPoint * pB = *(ppBodies + i);
-        if(!pB->movable) {
-            continue;
-        }
+        Gravity(&pB->position, &field);
+
+        pB->velocity = Vector2Add(pB->velocity, Vector2Scale(field, deltaT));
         pB->position = Vector2Add(pB->position, Vector2Scale(pB->velocity, deltaT));
         
         if(pB->trail) {
@@ -113,4 +113,52 @@ void updateSystem(
         }
     }
     tickNum++;
+}
+    
+
+void * N2ThreadWorker(void* n2Arg) 
+{
+    for(uint32_t i = ((dtPhysThread*)n2Arg)->iBodyStart;
+        i < ((dtPhysThread*)n2Arg)->iBodyNumber + ((dtPhysThread*)n2Arg)->iBodyStart; 
+        i++) {
+
+        dtMassPoint * pB = *(ppBodies + i);
+
+        if(!pB->movable) {
+            continue;
+        }
+        Vector2 field;
+
+        Gravity(&pB->position, &field);
+
+        pB->velocity = Vector2Add(pB->velocity, Vector2Scale(field, ((dtPhysThread*)n2Arg)->dTime));
+        
+        pB->position = Vector2Add(pB->position, Vector2Scale(pB->velocity, ((dtPhysThread*)n2Arg)->dTime));
+        
+        if(pB->trail) {
+            pB->trail[tickNum%TRAIL_LENGTH].position = pB->position;
+            pB->trail[tickNum%TRAIL_LENGTH].alpha = (float)TRAIL_MAX_ALPHA;
+        }
+    }   
+
+    return NULL;
+}
+
+
+void Newton2WithThreads(
+    const float deltaT) 
+{
+    uint16_t partition = getNumPlanets() / 2;
+
+    dtPhysThread w1 = {.dTime = deltaT, .iBodyNumber = getNumPlanets()/2, .iBodyStart = 0};
+    dtPhysThread w2 = {.dTime = deltaT, .iBodyNumber = getNumPlanets() - partition, .iBodyStart =  partition};
+
+    pthread_create(&worker1,NULL,N2ThreadWorker,&w1);
+    pthread_create(&worker2,NULL,N2ThreadWorker,&w2);
+
+    pthread_join(worker1, NULL);
+    pthread_join(worker2, NULL);
+    tickNum++;
+    
+    return;
 }

@@ -7,6 +7,7 @@
 #include "view.h"
 #include "physics.h"
 
+#include <math.h>
 #include <pthread.h>
 
 
@@ -23,12 +24,12 @@ int main(void)
     const int screenWidth = 1250;
     const int screenHeight = 1000;
     const float simScale  = 1.f * 3600.f; // [s]
-    //const float simScale  = 1.f * 3600.f; // [s]
     float frameTimeScale = simScale * 24.f;
     const int fontHeight = 20;
     const int fontWidth  = fontHeight * 0.55f;
     float delT = 0.f;
     float scaledElapsedTime = 0.f;
+    bool simulationWarning = false;
     currentView.screenCenter.x = screenWidth*0.5f;
     currentView.screenCenter.y = screenHeight*0.5f;
     currentView.centerFOV = NULL;
@@ -64,13 +65,15 @@ int main(void)
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         float simFrameTime = 0.f;
+
+
         // Collect Input
         //----------------------------------------------------------------------------------
         int key = GetKeyPressed();
         float mWheel = GetMouseWheelMove();
         
         if(mWheel) {
-            currentView.pixelPerMeter *= exp10(mWheel/100);
+            currentView.pixelPerMeter *= exp(mWheel/100);
         }
         
         switch (key)
@@ -95,6 +98,10 @@ int main(void)
             break;
         }
 
+        if (frameTimeScale < simScale) {
+            frameTimeScale = simScale;
+        }
+
         // Update Model
         //----------------------------------------------------------------------------------
         do{
@@ -102,17 +109,15 @@ int main(void)
             simFrameTime += delT;
 
             Newton2(delT);
-            updateSystem(delT);
+
         }while (simFrameTime < GetFrameTime() * frameTimeScale);
 
         scaledElapsedTime += simFrameTime;
- 
-        
 
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
-
+        {
             ClearBackground(BLACK);
 
             DrawFPS(screenWidth-6*fontHeight, screenHeight-30);
@@ -129,12 +134,9 @@ int main(void)
                     frameTimeScale/7.f/24.f/3600.f);
             DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, RAYWHITE);
 
-
             textPos.y = 10;
 
             memset(textBuff, 0, LINE_LENGTH);
-            
-
             
             for(uint16_t pl = 0u; pl < getNumPlanets(); pl++){
                 textBuff[0] = 0;
@@ -156,14 +158,27 @@ int main(void)
                         sprintf(textBuff, 
                             "System DELTA-E: %+4.1E %%",
                             100.f*(sysFullEnergyInit - sysFullEnergy)/sysFullEnergyInit);
-
             DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, RED);
 
+            memset(textBuff, 0, LINE_LENGTH);
+
+            
+            
+            Vector2 mouseP = GetMousePosition();
+            Vector2 pointerWorld = toRealCoord(&mouseP, &currentView);
+            
+            textPos.x = 10;
+            sprintf(textBuff, 
+                "Screen\tX: %.0f p Y: %.0f p\nReal\tX: %+4.1E m Y: %+4.1E m",
+                mouseP.x, mouseP.y,
+                pointerWorld, pointerWorld);
+
+            DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, GREEN);
 
             textPos.y = screenHeight - 4*fontHeight;
-            textPos.x = 10;
+            
             DrawTextEx(inFont, " ENTER:\tchange planet\n left-SHIFT / left-CTRL:\tincrease/decrease animation speed\n + / -:\tzoom in/out\n ", textPos, fontHeight, 1, GRAY);
-
+        }
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
