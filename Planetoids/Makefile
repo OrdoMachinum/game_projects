@@ -42,12 +42,13 @@ endif
 INCLUDE_DIR = include
 SOURCE_DIR	= src
 
-run: all
-	./$(OUT_DIR)/$(PROJECT)$(OUT_EXTENSION)
 
 all: $(OBJECTS)
 	mkdir -p $(OUT_DIR)
 	$(CC) $(OBJECTS) -o $(OUT_DIR)/$(PROJECT)$(OUT_EXTENSION) $(CFLAGS)
+
+run: all
+	./$(OUT_DIR)/$(PROJECT)$(OUT_EXTENSION)
 
 $(OBJDIR)/%.o: src/%.c
 	mkdir -p $(OBJDIR)/
