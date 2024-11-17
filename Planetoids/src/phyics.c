@@ -10,7 +10,7 @@ typedef struct {
 pthread_t worker1;
 pthread_t worker2;
 
-static uint64_t tickNum = 0;
+uint64_t trailTickNum = 0;
 float sysFullEnergyInit = 0.f;
 float sysFullEnergy = 0.f;
 
@@ -107,12 +107,9 @@ void Newton2(
         pB->velocity = Vector2Add(pB->velocity, Vector2Scale(field, deltaT));
         pB->position = Vector2Add(pB->position, Vector2Scale(pB->velocity, deltaT));
         
-        if(pB->trail) {
-            pB->trail[tickNum%TRAIL_LENGTH].position = pB->position;
-            pB->trail[tickNum%TRAIL_LENGTH].alpha = (float)TRAIL_MAX_ALPHA;
-        }
+
     }
-    tickNum++;
+    //trailTickNum++;
 }
     
 
@@ -136,8 +133,8 @@ void * N2ThreadWorker(void* n2Arg)
         pB->position = Vector2Add(pB->position, Vector2Scale(pB->velocity, ((dtPhysThread*)n2Arg)->dTime));
         
         if(pB->trail) {
-            pB->trail[tickNum%TRAIL_LENGTH].position = pB->position;
-            pB->trail[tickNum%TRAIL_LENGTH].alpha = (float)TRAIL_MAX_ALPHA;
+            pB->trail[trailTickNum%TRAIL_LENGTH].position = pB->position;
+            pB->trail[trailTickNum%TRAIL_LENGTH].alpha = (float)TRAIL_MAX_ALPHA;
         }
     }   
 
@@ -158,7 +155,7 @@ void Newton2WithThreads(
 
     pthread_join(worker1, NULL);
     pthread_join(worker2, NULL);
-    tickNum++;
+    trailTickNum++;
     
     return;
 }

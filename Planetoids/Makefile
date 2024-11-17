@@ -7,6 +7,9 @@ TARGET = LINUX
 #TARGET = BUILD_ON_WINDOWS
 #TARGET = BUILD_FOR_WINDOWS
 
+RAYLIB_INSTALL_DIR = c://raylib// #for on-windows-builds
+
+
 DEBUG_FLAGS ?= #-O0 -g
 
 ifeq ($(TARGET),LINUX)
@@ -23,8 +26,8 @@ CC = x86_64-w64-mingw32-gcc
 OUT_EXTENSION = .exe
 OBJDIR = obj_win
 OUT_DIR = bin/win
-LDLIBS = -Ic://raylib//include// -static-libgcc -lopengl32 -lgdi32 -lwinmm -static -lpthread -lm
-OBJECTS += c://raylib//lib//libraylib.a
+LDLIBS = -I$(RAYLIB_INSTALL_DIR)include// -static-libgcc -lopengl32 -lgdi32 -lwinmm -static -lpthread -lm
+OBJECTS += $(RAYLIB_INSTALL_DIR)//lib//libraylib.a
 CFLAGS = -Wall $(LDLIBS)
 else ifeq ($(TARGET),BUILD_FOR_WINDOWS)
 $(info Building FOR windows ON LINUX ...)
@@ -48,7 +51,7 @@ all: $(OBJECTS)
 	$(CC) $(OBJECTS) -o $(OUT_DIR)/$(PROJECT)$(OUT_EXTENSION) $(CFLAGS)
 
 run: all
-	./$(OUT_DIR)/$(PROJECT)$(OUT_EXTENSION)
+	./$(OUT_DIR)/$(PROJECT)$(OUT_EXTENSION) systems/tauri2000.csv
 
 $(OBJDIR)/%.o: src/%.c
 	mkdir -p $(OBJDIR)/

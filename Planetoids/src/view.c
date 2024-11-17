@@ -28,8 +28,6 @@ Vector2 toRealCoord(const Vector2 * const screenCoord, const dtView* const fov)
 void DrawPlanets(
     const dtView* const fov)
 {
-    static unsigned int trailTick = 0u;
-
     for(uint32_t i = 0u; i < getNumPlanets(); ++i) {
         
         dtMassPoint * pB = *(ppBodies + i);
@@ -37,8 +35,10 @@ void DrawPlanets(
         Vector2 scr = toScreenCoord(&(pB->position), fov);
 
         if(pB->radius * fov->pixelPerMeter < 1.f ) {
-            Color cl = pB->color;
+            Color cl = WHITE;
+            cl.a *= 0.2;
             DrawPixelV(scr, cl);
+            cl = RED;
             cl.a *= 0.3;
             DrawCircleLinesV(scr, INDICATOR_RADIUS_PX, cl);
         } else {
@@ -47,6 +47,11 @@ void DrawPlanets(
                
 
         if(NULL != pB->trail) {
+         
+            pB->trail[trailTickNum%TRAIL_LENGTH].position = pB->position;
+            pB->trail[trailTickNum%TRAIL_LENGTH].alpha = (float)TRAIL_MAX_ALPHA;
+        
+
             for (uint16_t tr = 0u; tr < TRAIL_LENGTH; tr++) {
                 Color traceColor = pB->color;
                 traceColor.a = (unsigned char)pB->trail[tr].alpha;
@@ -57,7 +62,6 @@ void DrawPlanets(
             }
         }
     }
-    trailTick = (trailTick+1) % TRAIL_LENGTH;
 }
 
 

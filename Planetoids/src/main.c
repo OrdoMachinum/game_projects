@@ -13,10 +13,12 @@
 
 #define FPS     (60u)
 
+const char * defaultSystem = "systems/tauri.csv";
+
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
-int main(void)
+int main(int argc, char *argv[])
 {
     // Initialization
     //--------------------------------------------------------------------------------------
@@ -33,7 +35,7 @@ int main(void)
     currentView.screenCenter.x = screenWidth*0.5f;
     currentView.screenCenter.y = screenHeight*0.5f;
     currentView.centerFOV = NULL;
-    
+    char * systemFileName = defaultSystem;
     uint16_t iPlanet = 0u;
          
 
@@ -42,7 +44,14 @@ int main(void)
         return err;        
     }
 
-    err = readSystemFromFile("systems/tauri.csv", ";");
+    if (1 == argc) {
+        printf("No system was given, so default system is loaded: tauri.csv\n");
+    } else if(2 == argc) {
+        systemFileName = *(argv+1);
+        printf("... file to be read: %s\n", systemFileName);
+    }
+
+    err = readSystemFromFile(systemFileName,";");
     if(err) {
         return err;
     }
@@ -54,7 +63,7 @@ int main(void)
 
     printf("Number of bodies : %u\n", getNumPlanets());
 
-    InitWindow(screenWidth, screenHeight, "Planetoids, refactored");
+    InitWindow(screenWidth, screenHeight, systemFileName);
 
     Font inFont = LoadFontEx("resources/Terminus.ttf",fontHeight, NULL,0);
 
@@ -148,7 +157,7 @@ int main(void)
                 updateEnergyOfBody(pB);
                 textPos.x = screenWidth - fontWidth *
                         sprintf(textBuff, 
-                            "%c [%15s] mass : %3.3E kg\t ",(pl == iPlanet)? '>' : ' ',
+                            "%c [%-12s] mass : %3.3E kg\t ",(pl == iPlanet)? '>' : ' ',
                             pB->name, 
                             pB->mass);
                 DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, pB->color);
@@ -174,13 +183,14 @@ int main(void)
             sprintf(textBuff, 
                 "Screen\tX: %.0f p Y: %.0f p\nReal\tX: %+4.1E m Y: %+4.1E m",
                 mouseP.x, mouseP.y,
-                pointerWorld, pointerWorld);
+                pointerWorld.x, pointerWorld.y);
 
             DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, GREEN);
 
             textPos.y = screenHeight - 4*fontHeight;
             
             DrawTextEx(inFont, " ENTER:\tchange planet\n left-SHIFT / left-CTRL:\tincrease/decrease animation speed\n + / -:\tzoom in/out\n ", textPos, fontHeight, 1, GRAY);
+            trailTickNum++;            
         }
         EndDrawing();
         //----------------------------------------------------------------------------------

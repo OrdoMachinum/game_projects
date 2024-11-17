@@ -21,6 +21,7 @@ void CalcInitEnergies(void);
 
 extern float sysFullEnergyInit;
 extern float sysFullEnergy;
+extern uint64_t trailTickNum;
 
 
 

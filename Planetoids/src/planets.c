@@ -195,6 +195,8 @@ static dtErrorID lineToMassPoint (
     pmP->velocity.y = cartesianTemp.y;
 
     
+
+    
     return NO_ERROR;
 }
 
@@ -218,6 +220,16 @@ dtErrorID readSystemFromFile(const char * const fName, const char* delimiter)
             break;
         }
         tempMass.color = WHITE;
+        if(tempMass.mass < M_SUN*0.8) {
+            tempMass.color.a *= 0.9;
+        }
+        if(tempMass.mass < M_URANUS*0.7) {
+            tempMass.color.a *= 0.9;
+        }
+        if(tempMass.mass < M_EARTH*0.333) {
+            tempMass.color.a *= 0.8;
+        }
+
         tempMass.movable = true;
         if((err = addBody(&tempMass))) {
             break;
