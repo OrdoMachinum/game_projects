@@ -73,7 +73,7 @@ int main(void)
         float mWheel = GetMouseWheelMove();
         
         if(mWheel) {
-            currentView.pixelPerMeter *= exp(mWheel/100);
+            currentView.pixelPerMeter *= exp(mWheel/37.5f);
         }
         
         switch (key)
@@ -104,11 +104,13 @@ int main(void)
 
         // Update Model
         //----------------------------------------------------------------------------------
+        uint32_t delTick = 0u; // To check how many full system update is done for the next frame
         do{
             delT = simScale / FPS;
             simFrameTime += delT;
 
             Newton2(delT);
+            delTick++;
 
         }while (simFrameTime < GetFrameTime() * frameTimeScale);
 
@@ -127,11 +129,13 @@ int main(void)
             Vector2 textPos = {10,10};
             char textBuff[LINE_LENGTH] = {0};
 
-            sprintf(textBuff, "Real time :\t%.1f day \t\t1 pixel = %2.1E km\nTime Step =\t%.1f s\nAnimation Speed =\t%3.1E week/frameSec. ",
+            sprintf(textBuff, 
+            "Real time :\t%.1f day \t\t1 pixel = %2.1E km\nTime Step =\t%.1f s\nAnimation Speed =\t%3.1E week/frameSec.\n System Update in a frame : %d\n",
                     scaledElapsedTime/24/3600,
                     1e3f/ currentView.pixelPerMeter,
                     delT,
-                    frameTimeScale/7.f/24.f/3600.f);
+                    frameTimeScale/7.f/24.f/3600.f,
+                    delTick);
             DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, RAYWHITE);
 
             textPos.y = 10;
@@ -142,12 +146,11 @@ int main(void)
                 textBuff[0] = 0;
                 dtMassPoint * pB = ppBodies[pl];
                 updateEnergyOfBody(pB);
-                textPos.x = screenWidth - fontWidth * ( 
+                textPos.x = screenWidth - fontWidth *
                         sprintf(textBuff, 
-                            "%c [%2d] mass : %3.3E kg\t DELTA-E: %+3.1E %%",(pl == iPlanet)? '>' : ' ',
-                            pl, 
-                            pB->mass,
-                            100.f*(pB->initialEnergy - pB->currentEnergy)/pB->initialEnergy));
+                            "%c [%15s] mass : %3.3E kg\t ",(pl == iPlanet)? '>' : ' ',
+                            pB->name, 
+                            pB->mass);
                 DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, pB->color);
                 textPos.y += fontHeight;
             }
