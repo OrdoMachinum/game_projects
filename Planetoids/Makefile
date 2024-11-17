@@ -5,6 +5,7 @@ OBJECTS = $(addprefix $(OBJDIR)/,$(addsuffix .o,$(UNITS)))
 
 TARGET = LINUX
 #TARGET = BUILD_ON_WINDOWS
+#TARGET = BUILD_FOR_WINDOWS
 
 DEBUG_FLAGS ?= #-O0 -g
 
@@ -16,9 +17,7 @@ OBJDIR = obj
 OUT_DIR = bin/linux
 LDLIBS = -lGL -lc -lm -lpthread -ldl -lrt -lm
 CFLAGS = -Wall -lraylib $(LDLIBS) -lX11 -lc $(DEBUG_FLAGS)
-endif
-
-ifeq ($(TARGET),BUILD_ON_WINDOWS)
+else ifeq ($(TARGET),BUILD_ON_WINDOWS)
 $(info Building ON windows FOR windows...)
 CC = x86_64-w64-mingw32-gcc
 OUT_EXTENSION = .exe
@@ -27,7 +26,7 @@ OUT_DIR = bin/win
 LDLIBS = -Ic://raylib//include// -static-libgcc -lopengl32 -lgdi32 -lwinmm -static -lpthread -lm
 OBJECTS += c://raylib//lib//libraylib.a
 CFLAGS = -Wall $(LDLIBS)
-else
+else ifeq ($(TARGET),BUILD_FOR_WINDOWS)
 $(info Building FOR windows ON LINUX ...)
 CC = x86_64-w64-mingw32-gcc
 OUT_EXTENSION = .exe
@@ -36,6 +35,8 @@ OUT_DIR = bin/win
 LDLIBS = -I/usr/local/include/ -static-libgcc -lopengl32 -lgdi32 -lwinmm -static -lpthread -lm
 OBJECTS += $(OBJDIR)/libraylib.a
 CFLAGS = -Wall $(LDLIBS)
+else
+$(error No valid TARGET is selected!!)
 endif
 
 INCLUDE_DIR = include
