@@ -1,9 +1,9 @@
 PROJECT = planets
-UNITS = view phyics planets main
+UNITS = inputs view phyics planets main
 
 OBJECTS = $(addprefix $(OBJDIR)/,$(addsuffix .o,$(UNITS)))
 
-TARGET = LINUX
+TARGET ?= LINUX
 #TARGET = BUILD_ON_WINDOWS
 #TARGET = BUILD_FOR_WINDOWS
 

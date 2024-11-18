@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <math.h>
 
-#include <raylib.h>
-#include <raymath.h>
+#include "raylib.h"
+#include "raymath.h"
 
 #include "errorID.h"
 
@@ -25,7 +25,6 @@
 #define SCALE_VELOCITY          (1e3f) /*km/s*/
 
 #define GAMMA (6.674e-11f)
-
 #define ORIG_2  {0.f,   0.f}
 
 #define M_SUN           (1.989e30f) // kg
@@ -85,7 +84,6 @@ typedef struct dtPolar2_t {
     float t;
 }dtPolar2;
 
-
 typedef struct dtPlanet_t{
     unsigned long int ID;
     char    name[MAXNAME_LENGTH];
@@ -119,9 +117,6 @@ dtMassPoint ** createRingOfBalls(
 dtPolar2 convToPolar2(const Vector2 * const cartesian);
 Vector2 convToCartesian2(const dtPolar2 * const polar);
 
-
 unsigned int getNumPlanets(void);
-
-
 
 #endif

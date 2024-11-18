@@ -8,6 +8,7 @@
         "readbodies.h": "c",
         "physics.h": "c",
         "errno.h": "c",
-        "features.h": "c"
+        "features.h": "c",
+        "inputs.h": "c"
     }
 }

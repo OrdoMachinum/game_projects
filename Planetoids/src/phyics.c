@@ -1,11 +1,12 @@
 #include"physics.h"
 
+#include <pthread.h>
+
 typedef struct {
     uint16_t iBodyStart; // Start index of calculation body in the case of multihreaded calculation 
     uint16_t iBodyNumber; // How many body is considered in this thread
     float   dTime;
 } dtPhysThread;
-
 
 pthread_t worker1;
 pthread_t worker2;
@@ -13,6 +14,15 @@ pthread_t worker2;
 uint64_t trailTickNum = 0;
 float sysFullEnergyInit = 0.f;
 float sysFullEnergy = 0.f;
+const float simultionScaling  = 1.f * 3600.f; // [s]
+float scaledElapsedTime = 0.f;
+
+float deltaTime_s = 0.f;
+
+void initSimulation(const uint8_t framePerSecundum)
+{
+    deltaTime_s = simultionScaling / framePerSecundum;
+}
 
 void CalcInitEnergies(void) 
 {
@@ -75,18 +85,14 @@ static void Gravity(
     field->x = 0.f;
     field->y = 0.f;
     for(uint32_t i = 0u; i < getNumPlanets(); i++){
-
         dtMassPoint * pB = *(ppBodies + i);
-
         if(Vector2Equals(pB->position, *position )){
             continue;
         }
         Vector2 relVec = Vector2Subtract(*position, pB->position);
         Vector2 iForce = Vector2Normalize(relVec);
-
         iForce = Vector2Scale(iForce,
             (-GAMMA * pB->mass/Vector2DistanceSqr(*position, pB->position )) );
-
         *field = Vector2Add(*field, iForce);
     }
 }
@@ -101,15 +107,10 @@ void Newton2(
             continue;
         }
         Vector2 field;
-
         Gravity(&pB->position, &field);
-
         pB->velocity = Vector2Add(pB->velocity, Vector2Scale(field, deltaT));
         pB->position = Vector2Add(pB->position, Vector2Scale(pB->velocity, deltaT));
-        
-
     }
-    //trailTickNum++;
 }
     
 
@@ -156,6 +157,5 @@ void Newton2WithThreads(
     pthread_join(worker1, NULL);
     pthread_join(worker2, NULL);
     trailTickNum++;
-    
     return;
 }
