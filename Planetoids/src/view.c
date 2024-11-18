@@ -58,7 +58,7 @@ void DrawPlanets(
             pB->trail[iTrailcurrent].alpha = (float)TRAIL_MAX_ALPHA;
         
 
-            for (uint16_t tr = 0u; tr < TRAIL_LENGTH; tr++) {
+            for (uint16_t tr = 0u; tr < TRAIL_LENGTH-1; tr++) {
                 Color traceColor = pB->color;
                 traceColor.a = (unsigned char)pB->trail[tr].alpha;
                 scr = toScreenCoord(&(pB->trail[tr].position), fov);
