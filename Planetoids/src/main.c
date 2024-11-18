@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     bool simulationWarning = false;
     currentView.screenCenter.x = screenWidth*0.5f;
     currentView.screenCenter.y = screenHeight*0.5f;
-    currentView.centerFOV = NULL;
+    currentView.centerFOVinWorld = NULL;
     char * systemFileName = defaultSystem;
     uint16_t iPlanet = 0u;
          
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 
     //createRingOfBalls(D_SUN_MERCURY, R_JUPITER,M_JUPITER,14u);
 
-    currentView.centerFOV = &(ppBodies[0]->position);
+    currentView.centerFOVinWorld = &(ppBodies[0]->position);
 
     printf("Number of bodies : %u\n", getNumPlanets());
 
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
             break;
         case KEY_ENTER:
             iPlanet = (iPlanet+1u)%getNumPlanets();
-            currentView.centerFOV = &(ppBodies[iPlanet]->position);
+            currentView.centerFOVinWorld = &(ppBodies[iPlanet]->position);
             break;
         default:
             break;
@@ -115,10 +115,13 @@ int main(int argc, char *argv[])
         //----------------------------------------------------------------------------------
         uint32_t delTick = 0u; // To check how many full system update is done for the next frame
         do{
+            // In this loop we use the fact that the required animation frameTime allows more 
+            // physical system update. In this way simulation step could remain
+            // intependent of the framerate, so the numerical instability culd be elminated.
             delT = simScale / FPS;
             simFrameTime += delT;
 
-            Newton2(delT);
+            Newton2(delT);  // Physical world update
             delTick++;
 
         }while (simFrameTime < GetFrameTime() * frameTimeScale);
@@ -190,7 +193,7 @@ int main(int argc, char *argv[])
             textPos.y = screenHeight - 4*fontHeight;
             
             DrawTextEx(inFont, " ENTER:\tchange planet\n left-SHIFT / left-CTRL:\tincrease/decrease animation speed\n + / -:\tzoom in/out\n ", textPos, fontHeight, 1, GRAY);
-            trailTickNum++;            
+                        
         }
         EndDrawing();
         //----------------------------------------------------------------------------------

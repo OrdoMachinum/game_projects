@@ -13,7 +13,7 @@
 #define LINE_LENGTH (250)
 
 typedef struct dtView_tag{
-    Vector2 * centerFOV;
+    Vector2 * centerFOVinWorld;
     Vector2 screenCenter;
     float pixelPerMeter;
     float pixelPerMeterPlanets;
@@ -23,6 +23,8 @@ extern dtView currentView;
 
 
 void DrawPlanets(const dtView* const fov);
+
+void ShowGUI(void);
 
 void printDats(FILE * const gp, const dtMassPoint * pl);
 Vector2 toRealCoord(const Vector2 * const screenCoord, const dtView* const fov);

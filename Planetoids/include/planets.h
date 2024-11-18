@@ -18,7 +18,7 @@
 #define MAXNAME_LENGTH      (35)
 
 #define TRAIL_LENGTH        (2000u)
-#define TRAIL_MAX_ALPHA        (60)
+#define TRAIL_MAX_ALPHA        (156)
 
 #define SCALE_RADIUS            (1e3f) /*km*/
 #define SCALE_POSITION          (1e9f) /*million km*/
