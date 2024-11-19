@@ -21,8 +21,7 @@ int main(int argc, char *argv[])
     unsigned long err = NO_ERROR;
     char * systemFileName = defaultSystem;
 
-    err = initSystem();
-    if(err) {
+    if(err = initSystem()) {
         return err;        
     }
 
@@ -33,8 +32,7 @@ int main(int argc, char *argv[])
         printf("... file to be read: %s\n", systemFileName);
     }
 
-    err = readSystemFromFile(systemFileName,";");
-    if(err) {
+    if(err = readSystemFromFile(systemFileName,";")) {
         return err;
     }
 

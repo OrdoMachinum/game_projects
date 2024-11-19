@@ -11,7 +11,6 @@
 
 #include "raylib.h"
 #include "raymath.h"
-
 #include "errorID.h"
 
 #define SYS_INCREMENT       (40u)
@@ -99,7 +98,7 @@ typedef struct dtPlanet_t{
     dtTrace * trail;
 }dtMassPoint;
 
-extern dtMassPoint ** ppBodies;
+extern dtMassPoint ** ppBodies; // An array which contains the pointers to all body of the system
 
 dtErrorID initSystem(void);
 dtErrorID addBody(const dtMassPoint * const pBody);
@@ -118,5 +117,8 @@ dtPolar2 convToPolar2(const Vector2 * const cartesian);
 Vector2 convToCartesian2(const dtPolar2 * const polar);
 
 unsigned int getNumPlanets(void);
+
+unsigned char ScaleUChar(const float value, const float minF, const float maxF);
+
 
 #endif

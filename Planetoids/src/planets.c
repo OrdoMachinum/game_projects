@@ -220,15 +220,8 @@ dtErrorID readSystemFromFile(const char * const fName, const char* delimiter)
             break;
         }
         tempMass.color = WHITE;
-        if(tempMass.mass < M_SUN*0.8) {
-            tempMass.color.a *= 0.9;
-        }
-        if(tempMass.mass < M_URANUS*0.7) {
-            tempMass.color.a *= 0.9;
-        }
-        if(tempMass.mass < M_EARTH*0.333) {
-            tempMass.color.a *= 0.8;
-        }
+
+        tempMass.color.a = ScaleUChar(tempMass.mass, 0.f, 0.1*M_SUN);
 
         tempMass.movable = true;
         if((err = addBody(&tempMass))) {
@@ -269,4 +262,17 @@ dtMassPoint ** createRingOfBalls(
         addBody(&tempMass);
     }
     return ppFirstBody;
+}
+
+
+
+unsigned char ScaleUChar(const float value, const float minF, const float maxF)
+{
+    if (value > maxF)
+        return 255u;
+    if (value <= 0)
+        return 0u;
+
+    const float k = 255.f /log10(maxF);
+    return (unsigned char)(k*log10(value));
 }

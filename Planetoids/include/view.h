@@ -41,4 +41,5 @@ void printDats(FILE * const gp, const dtMassPoint * pl);
 
 Vector2 toRealCoord(const Vector2 * const screenCoord, const dtView* const fov);
 
+
 #endif

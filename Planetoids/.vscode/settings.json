@@ -9,6 +9,7 @@
         "physics.h": "c",
         "errno.h": "c",
         "features.h": "c",
-        "inputs.h": "c"
+        "inputs.h": "c",
+        "errorid.h": "c"
     }
 }
