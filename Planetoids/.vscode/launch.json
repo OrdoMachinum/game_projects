@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/linux/planets.out",
-            "args": [],
+            "args": ["${workspaceFolder}/systems/tauri2000.csv"],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],

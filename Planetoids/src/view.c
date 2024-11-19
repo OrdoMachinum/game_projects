@@ -37,10 +37,21 @@ void initView(const char * systemFileName)
 
 Vector2 toScreenCoord(const Vector2 * const realCoord, const dtView* const fov) 
 {
-    return Vector2Add(fov->screenCenter, 
-    Vector2Scale(
-                Vector2Subtract( *(fov->centerFOVinWorld), *realCoord),
-            fov->pixelPerMeter) );
+    Vector2 retV;
+    // Calculation in double precision to lessening the numerical error
+    double X = (double)(fov->centerFOVinWorld->x) - (double)(realCoord->x);
+    double Y = (double)(fov->centerFOVinWorld->y) - (double)(realCoord->y);
+
+    X *= fov->pixelPerMeter;
+    Y *= fov->pixelPerMeter;
+
+    X += fov->screenCenter.x;
+    Y += fov->screenCenter.y;
+
+    retV.x = round(X);
+    retV.y = round(Y);
+
+    return retV;
 }
 
 Vector2 toRealCoord(const Vector2 * const screenCoord, const dtView* const fov) 

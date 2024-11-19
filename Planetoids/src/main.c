@@ -62,9 +62,9 @@ int main(int argc, char *argv[])
 
             Newton2(deltaTime_s);  // Physical world update
             delTick++;
-
+            
         }while (simFrameTime < GetFrameTime() * frameTimeScale);
-
+        
         scaledElapsedTime += simFrameTime;
 
         // Draw

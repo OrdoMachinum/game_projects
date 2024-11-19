@@ -192,8 +192,8 @@ static dtErrorID lineToMassPoint (
 
     cartesianTemp = convToCartesian2(&polarVelocity);
     pmP->velocity.x = cartesianTemp.x;
-    pmP->velocity.y = cartesianTemp.y;
-
+    pmP->velocity.y = cartesianTemp.y; 
+    
     
 
     
@@ -221,7 +221,7 @@ dtErrorID readSystemFromFile(const char * const fName, const char* delimiter)
         }
         tempMass.color = WHITE;
 
-        tempMass.color.a = ScaleUChar(tempMass.mass, 0.f, 0.1*M_SUN);
+        tempMass.color.a = ScaleUChar(tempMass.mass, 0.f, M_JUPITER);
 
         tempMass.movable = true;
         if((err = addBody(&tempMass))) {
