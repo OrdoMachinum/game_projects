@@ -119,58 +119,58 @@ void DrawPlanets(
 
 void ShowGUI(void)
 {
-              Vector2 textPos = {10,10};
-            char textBuff[LINE_LENGTH] = {0};
+    Vector2 textPos = {10,10};
+    char textBuff[LINE_LENGTH] = {0};
 
-            sprintf(textBuff, 
-            "Real time :\t%.1f day \t\t1 pixel = %2.1E km\nTime Step =\t%.1f s\nAnimation Speed =\t%3.1E week/frameSec.\n System Update in a frame : %d\n",
-                    scaledElapsedTime/24/3600,
-                    1e3f/ currentView.pixelPerMeter,
-                    deltaTime_s,
-                    frameTimeScale/7.f/24.f/3600.f,
-                    delTick);
-            DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, RAYWHITE);
+    sprintf(textBuff, 
+    "Real time :\t%.1f day \t\t1 pixel = %2.3E m\nTime Step =\t%.1f s\nAnimation Speed =\t%3.1E week/frameSec.\n System Update in a frame : %d\n",
+            scaledElapsedTime/24/3600,
+            1.f / currentView.pixelPerMeter,
+            deltaTime_s,
+            frameTimeScale/7.f/24.f/3600.f,
+            delTick);
+    DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, RAYWHITE);
 
-            textPos.y = 10;
+    textPos.y = 10;
 
-            memset(textBuff, 0, LINE_LENGTH);
-            
-            for(uint16_t pl = 0u; pl < getNumPlanets(); pl++){
-                textBuff[0] = 0;
-                dtMassPoint * pB = ppBodies[pl];
-                updateEnergyOfBody(pB);
-                textPos.x = screenWidth - fontWidth *
-                        sprintf(textBuff, 
-                            "%c [%-12s] mass : %3.3E kg\t ",(pl == iPlanetInFocus)? '>' : ' ',
-                            pB->name, 
-                            pB->mass);
-                DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, pB->color);
-                textPos.y += fontHeight;
-            }
+    memset(textBuff, 0, LINE_LENGTH);
+    
+    for(uint16_t pl = 0u; pl < getNumPlanets(); pl++){
+        textBuff[0] = 0;
+        dtMassPoint * pB = ppBodies[pl];
+        updateEnergyOfBody(pB);
+        textPos.x = screenWidth - fontWidth *
+                sprintf(textBuff, 
+                    "%c [%-12s] mass : %3.3E kg\t ",(pl == iPlanetInFocus)? '>' : ' ',
+                    pB->name, 
+                    pB->mass);
+        DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, pB->color);
+        textPos.y += fontHeight;
+    }
 
-            calcSysFullEnergy();
-            memset(textBuff, 0, LINE_LENGTH);
-            textPos.x = screenWidth - fontWidth *
-                        sprintf(textBuff, 
-                            "System DELTA-E: %+4.1E %%",
-                            100.f*(sysFullEnergyInit - sysFullEnergy)/sysFullEnergyInit);
-            DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, RED);
+    calcSysFullEnergy();
+    memset(textBuff, 0, LINE_LENGTH);
+    textPos.x = screenWidth - fontWidth *
+                sprintf(textBuff, 
+                    "System DELTA-E: %+4.1E %%",
+                    100.f*(sysFullEnergyInit - sysFullEnergy)/sysFullEnergyInit);
+    DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, RED);
 
-            memset(textBuff, 0, LINE_LENGTH);
+    memset(textBuff, 0, LINE_LENGTH);
 
-            Vector2 pointerWorld = toRealCoord(&mouseP, &currentView);
-            
-            textPos.x = 10;
-            sprintf(textBuff, 
-                "Screen\tX: %.0f p Y: %.0f p\nReal\tX: %+4.1E m Y: %+4.1E m",
-                mouseP.x, mouseP.y,
-                pointerWorld.x, pointerWorld.y);
+    Vector2 pointerWorld = toRealCoord(&mouseP, &currentView);
+    
+    textPos.x = 10;
+    sprintf(textBuff, 
+        "Screen\tX: %.0f p Y: %.0f p\nReal\tX: %+4.3E m Y: %+4.3E m",
+        mouseP.x, mouseP.y,
+        pointerWorld.x, pointerWorld.y);
 
-            DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, GREEN);
+    DrawTextEx(inFont, textBuff, textPos, fontHeight, 1, GREEN);
 
-            textPos.y = screenHeight - 4*fontHeight;
-            
-            DrawTextEx(inFont, " ENTER:\tchange planet\n left-SHIFT / left-CTRL:\tincrease/decrease animation speed\n + / -:\tzoom in/out\n ", textPos, fontHeight, 1, GRAY);
+    textPos.y = screenHeight - 4*fontHeight;
+    
+    DrawTextEx(inFont, " ENTER:\tchange planet\n left-SHIFT / left-CTRL:\tincrease/decrease animation speed\n + / -:\tzoom in/out\n ", textPos, fontHeight, 1, GRAY);
 }
 
 

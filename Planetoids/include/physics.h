@@ -5,14 +5,6 @@
 #include "raylib.h"
 #include "raymath.h"
 
-
-extern float sysFullEnergyInit;
-extern float sysFullEnergy;
-extern uint64_t trailTickNum;
-extern float scaledElapsedTime;
-extern float deltaTime_s;
-extern const float simultionScaling;
-
 void initSimulation(const uint8_t framePerSecundum);
 
 void Newton2(const float deltaTs);
@@ -26,6 +18,13 @@ void calcSysFullEnergy(void);
 
 void CalcInitEnergies(void);
 
+
+extern float sysFullEnergyInit;
+extern float sysFullEnergy;
+extern uint64_t trailTickNum;
+extern float scaledElapsedTime;
+extern float deltaTime_s;
+extern const float simultionScaling;
 
 
 #endif
