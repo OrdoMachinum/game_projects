@@ -30,9 +30,17 @@ typedef struct dtHybridMagnitudePosition_t {
 } dtHybridMagnitudeVector;
 
 void Vec2ToHybrid(const Vector2 * const inVec, dtHybridMagnitudeVector * const hybridPosition);
+void HybridToVec2(const dtHybridMagnitudeVector * const inHybridPosition, Vector2 * const vec2);
 
 void HybridLengthSqr(const dtHybridMagnitudeVector * const hybVect, dtHybridLength * const hSquareLength);
 void SqrtHybridLength(const dtHybridLength * const hybLength, dtHybridLength * const hSquareRoot);
+
+float HybridFloatLength(const dtHybridLength * const h);
+void HybridSubtract(const dtHybridMagnitudeVector * const v1, const dtHybridMagnitudeVector * const v2, dtHybridMagnitudeVector * const v1v2);
+void HybridAdd(const dtHybridMagnitudeVector * const v1, const dtHybridMagnitudeVector * const v2, dtHybridMagnitudeVector * const v1v2);
+void HybridScale(const dtHybridMagnitudeVector * const v, const float scale);
+
+void HybVectOrdnung(dtHybridMagnitudeVector * const v);
 
 
 #endif

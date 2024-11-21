@@ -2,7 +2,6 @@
 
 #define ROUND_M   floorf
 
-
 void Vec2ToHybrid(
     const Vector2 * const inVec, 
     dtHybridMagnitudeVector * const hybridPosition)
@@ -51,5 +50,76 @@ void SqrtHybridLength(const dtHybridLength * const hybLength, dtHybridLength * c
 
         hSquareRoot->solidus = ROUND(rt * INV_GRID_SCALE);
         hSquareRoot->articlus = fmodf(rt,GRID_SCALE);
+    }
+}
+
+
+float HybridFloatLength(const dtHybridLength * const h)
+{
+    return h->solidus * GRID_SCALE + h->articlus;
+}
+
+/* v1 - v2 */
+void HybridSubtract(
+    const dtHybridMagnitudeVector * const v1,
+    const dtHybridMagnitudeVector * const v2,
+    dtHybridMagnitudeVector * const v1v2)
+{
+    v1v2->K.X = v1->K.X - v2->K.X;
+    v1v2->K.Y = v1->K.Y - v2->K.Y;
+    v1v2->q.x = v1->q.x - v2->q.x;
+    v1v2->q.y = v1->q.y - v2->q.y;
+}
+
+/* v1 + v2 */
+void HybridAdd(
+    const dtHybridMagnitudeVector * const v1,
+    const dtHybridMagnitudeVector * const v2,
+    dtHybridMagnitudeVector * const v1v2)
+{
+    v1v2->K.X = v1->K.X + v2->K.X;
+    v1v2->K.Y = v1->K.Y + v2->K.Y;
+    v1v2->q.x = v1->q.x + v2->q.x;
+    v1v2->q.y = v1->q.y + v2->q.y;
+}
+
+void HybridScale(
+    dtHybridMagnitudeVector * const v, 
+    const float scale)
+{
+    float fK = scale * v->K.X;
+    float fq = scale * v->q.x;
+
+    fq += fmodf(fK, GRID_SCALE) * GRID_SCALE;
+    v->K.X = ROUND_M(fK);
+    v->q.x = fq;
+
+    fK = scale * v->K.Y;
+    fq = scale * v->q.y;
+
+    fq += fmodf(fK, GRID_SCALE) * GRID_SCALE;
+    v->K.Y = ROUND_M(fK);
+    v->q.y = fq;
+}
+
+void HybridToVec2(
+    const dtHybridMagnitudeVector * const inHybridPosition,
+    Vector2 * const vec2)
+{
+    vec2->x = inHybridPosition->K.X * GRID_SCALE + inHybridPosition->q.x;
+    vec2->y = inHybridPosition->K.Y * GRID_SCALE + inHybridPosition->q.y;
+}
+
+void HybVectOrdnung(
+    dtHybridMagnitudeVector * const v)
+{
+    if( GRID_SCALE < fabsf(v->q.x) ) {
+        v->K.X += ROUND_M(v->q.x / GRID_SCALE);
+        v->q.x -= fmodf(v->q.x, GRID_SCALE) * GRID_SCALE;
+    }
+
+    if( GRID_SCALE < fabsf(v->q.y) ) {
+        v->K.Y += ROUND_M(v->q.y / GRID_SCALE);
+        v->q.y -= fmodf(v->q.y, GRID_SCALE) * GRID_SCALE;
     }
 }
