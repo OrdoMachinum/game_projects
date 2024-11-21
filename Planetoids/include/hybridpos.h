@@ -2,12 +2,13 @@
 #define HYBRIDPOS_H
 
 #include <stdint.h>
+#include <string.h>
 #include "raylib.h"
 #include "raymath.h"
 
-#define GRID_SCALE ((float)(1.496e10f)) // Closest exact float32 number to 0.1 Astrtonomical Unit
-#define INV_GRID_SCALE ((float)(1.f/1.496e10f)) 
-#define SQRT_GRID_SCALE ((float)(122311.078811f)) 
+#define GRID_SCALE ((float)(1.496e9f)) // Closest exact float32 number to 0.1 Astrtonomical Unit
+#define INV_GRID_SCALE ((float)(1.f/GRID_SCALE)) 
+#define SQRT_GRID_SCALE ((float)(sqrtf(GRID_SCALE))) 
 
 typedef struct dtHybridLength_t {
     int32_t solidus;        // Closest big-range point's id
@@ -38,9 +39,11 @@ void SqrtHybridLength(const dtHybridLength * const hybLength, dtHybridLength * c
 float HybridFloatLength(const dtHybridLength * const h);
 void HybridSubtract(const dtHybridMagnitudeVector * const v1, const dtHybridMagnitudeVector * const v2, dtHybridMagnitudeVector * const v1v2);
 void HybridAdd(const dtHybridMagnitudeVector * const v1, const dtHybridMagnitudeVector * const v2, dtHybridMagnitudeVector * const v1v2);
-void HybridScale(const dtHybridMagnitudeVector * const v, const float scale);
+void HybridScale(dtHybridMagnitudeVector * const v, const float scale);
 
 void HybVectOrdnung(dtHybridMagnitudeVector * const v);
+
+bool HybPosEquals(const dtHybridMagnitudeVector * const a, const dtHybridMagnitudeVector * const b);
 
 
 #endif

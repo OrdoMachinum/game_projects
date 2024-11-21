@@ -77,6 +77,10 @@ dtErrorID addBody(const dtMassPoint * const pBody)
         ppBodies = newArray;
     }
     
+
+    Vec2ToHybrid(&(pBody->position), &(pBody->hPos));
+    
+
     memcpy(pNewMP, pBody, sizeof(dtMassPoint));
 
     pNewMP->ID = numberOfBodies;
@@ -94,7 +98,10 @@ dtErrorID addBody(const dtMassPoint * const pBody)
     }
     
     *(ppBodies+numberOfBodies) = pNewMP;
-    printf("Object is added with ID:\t%lu\n", (*(ppBodies+numberOfBodies))->ID);
+    printf("Object is added with ID: %3lu x=%+4.4ef(%+4d gridpoint, %+4.4e m) y=%+4.4ef(%+4d gridpoint, %+4.4e m)\n",
+        (*(ppBodies+numberOfBodies))->ID,
+        pNewMP->position.x, pNewMP->hPos.K.X, pNewMP->hPos.q.x,
+        pNewMP->position.y, pNewMP->hPos.K.Y, pNewMP->hPos.q.y);
 
     numberOfBodies++;
     return NO_ERROR;

@@ -97,8 +97,39 @@ static void Gravity(
     }
 }
 
+static void GravityWithHybridPosition(
+    const dtHybridMagnitudeVector * const position,
+    Vector2 * const field)
+{
+    field->x = 0.f;
+    field->y = 0.f;
+    for(uint32_t i = 0u; i < getNumPlanets(); i++){
+        dtMassPoint * pB = *(ppBodies + i);
+        HybVectOrdnung(&(pB->hPos));
+        if(HybPosEquals(&(pB->hPos), position )){
+            continue;
+        }
+        dtHybridMagnitudeVector relVecH;
+        HybridSubtract(position, &(pB->hPos), &relVecH);
+
+        dtHybridLength d_square_h;
+        HybridLengthSqr(&relVecH, &d_square_h);
+        float d_square = HybridFloatLength(&d_square_h);
+
+        
+        Vector2 iForce;
+        HybridToVec2(&relVecH,&iForce);
+        
+        iForce = Vector2Normalize(iForce);
+
+        iForce = Vector2Scale(iForce,
+            (-GAMMA * pB->mass/d_square ));
+        *field = Vector2Add(*field, iForce);
+    }
+}
+
 void Newton2(
-    const float deltaT) 
+    const float deltaTs) 
 {
     for(uint32_t i = 0u; i < getNumPlanets(); i++) {
         dtMassPoint * pB = *(ppBodies + i);
@@ -108,10 +139,41 @@ void Newton2(
         }
         Vector2 field;
         Gravity(&pB->position, &field);
-        pB->velocity = Vector2Add(pB->velocity, Vector2Scale(field, deltaT));
-        pB->position = Vector2Add(pB->position, Vector2Scale(pB->velocity, deltaT));
+        pB->velocity = Vector2Add(pB->velocity, Vector2Scale(field, deltaTs));
+        pB->position = Vector2Add(pB->position, Vector2Scale(pB->velocity, deltaTs));
     }
 }
+void Newton2WithHybridPositioning(
+    const float deltaTs)
+{
+    for(uint32_t i = 0u; i < getNumPlanets(); i++) {
+        dtMassPoint * pB = *(ppBodies + i);
+
+        if(!pB->movable) {
+            continue;
+        }
+        Vector2 field;
+
+        GravityWithHybridPosition(&pB->hPos, &field);
+
+        pB->velocity = Vector2Add(pB->velocity, Vector2Scale(field, deltaTs));
+
+        dtHybridMagnitudeVector hDeltaPos = {
+            .K.X = 0,
+            .K.Y = 0,
+            .q.x = pB->velocity.x * deltaTs,
+            .q.y = pB->velocity.y * deltaTs,
+        };
+        dtHybridMagnitudeVector hNewPos;
+
+        HybridAdd(&(pB->hPos), &hDeltaPos, &hNewPos);
+        memcpy(&(pB->hPos), &hNewPos, sizeof(dtHybridLength));
+
+        HybridToVec2(&hNewPos, &(pB->position));
+    }
+
+}
+
     
 
 void * N2ThreadWorker(void* n2Arg) 

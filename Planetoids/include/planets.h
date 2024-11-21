@@ -12,6 +12,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "errorID.h"
+#include "hybridpos.h"
 
 #define SYS_INCREMENT       (40u)
 #define MAXNAME_LENGTH      (35)
@@ -90,6 +91,7 @@ typedef struct dtPlanet_t{
     bool    simulate;
     bool    movable;
     float   mass;
+    dtHybridMagnitudeVector hPos;
     Vector2 position;
     Vector2 velocity;
     float   initialEnergy;

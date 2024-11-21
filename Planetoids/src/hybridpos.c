@@ -1,5 +1,6 @@
 #include "hybridpos.h"
 
+#define EPSILONH ((float)0.000030517578f)
 #define ROUND_M   floorf
 
 void Vec2ToHybrid(
@@ -7,10 +8,10 @@ void Vec2ToHybrid(
     dtHybridMagnitudeVector * const hybridPosition)
 {
     hybridPosition->K.X = ROUND_M(INV_GRID_SCALE * inVec->x);
-    hybridPosition->q.x = inVec->x - hybridPosition->K.X;
+    hybridPosition->q.x = fmodf(inVec->x, GRID_SCALE);
 
     hybridPosition->K.Y = ROUND_M(INV_GRID_SCALE * inVec->y);
-    hybridPosition->q.y = inVec->y - hybridPosition->K.Y;
+    hybridPosition->q.y = fmodf(inVec->y, GRID_SCALE);
 }
 
 void HybridLengthSqr(
@@ -21,13 +22,16 @@ void HybridLengthSqr(
     const float qKMixed = hybVect->K.X * hybVect->q.x + hybVect->K.Y * hybVect->q.y;                // [m*AU]
     const float kOnly = (hybVect->K.X * hybVect->K.X + hybVect->K.Y * hybVect->K.Y);     // [AU^2]
 
-    hSquareLength->solidus = ROUND_M(INV_GRID_SCALE*qSquare);
+    float fi = qSquare*INV_GRID_SCALE;
+    int a = (int32_t)floorf(fi);
+
+    hSquareLength->solidus = (int32_t)floorf(qSquare*INV_GRID_SCALE);
     hSquareLength->articlus = fmodf(qSquare,GRID_SCALE);
     
-    hSquareLength->solidus += ROUND_M(qKMixed);
+    hSquareLength->solidus += (int32_t)floorf(qKMixed);
     hSquareLength->articlus += fmodf(qKMixed, 1.f) * GRID_SCALE;
 
-    hSquareLength->solidus += ROUND_M(GRID_SCALE*kOnly);
+    hSquareLength->solidus += (int32_t)ROUND_M(GRID_SCALE*kOnly);
     // GRID_SCALE and the Ks are integers!
 }
 
@@ -48,7 +52,7 @@ void SqrtHybridLength(const dtHybridLength * const hybLength, dtHybridLength * c
 
         rt *= SQRT_GRID_SCALE;
 
-        hSquareRoot->solidus = ROUND(rt * INV_GRID_SCALE);
+        hSquareRoot->solidus = ROUND_M(rt * INV_GRID_SCALE);
         hSquareRoot->articlus = fmodf(rt,GRID_SCALE);
     }
 }
@@ -122,4 +126,19 @@ void HybVectOrdnung(
         v->K.Y += ROUND_M(v->q.y / GRID_SCALE);
         v->q.y -= fmodf(v->q.y, GRID_SCALE) * GRID_SCALE;
     }
+}
+
+
+bool HybPosEquals(
+    const dtHybridMagnitudeVector * const a,
+    const dtHybridMagnitudeVector * const b)
+{
+    if(a->K.X != b->K.X || a->K.Y != b->K.Y) {
+        return false;
+    }
+
+    int result = ((fabsf(a->q.x - b->q.x)) <= (EPSILONH*fmaxf(1.0f, fmaxf(fabsf(a->q.x), fabsf(b->q.x))))) &&
+                  ((fabsf(a->q.y - b->q.y)) <= (EPSILONH*fmaxf(1.0f, fmaxf(fabsf(a->q.y), fabsf(b->q.y)))));
+
+    return result;
 }

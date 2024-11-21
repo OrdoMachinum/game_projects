@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
             simFrameTime += deltaTime_s;
 
             Newton2(deltaTime_s);  // Physical world update
+            //Newton2WithHybridPositioning(deltaTime_s);  // Physical world update
             delTick++;
             
         }while (simFrameTime < GetFrameTime() * frameTimeScale);

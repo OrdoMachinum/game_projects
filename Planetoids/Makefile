@@ -1,5 +1,5 @@
 PROJECT = planets
-UNITS = inputs view phyics planets main
+UNITS = hybridpos inputs view phyics planets main
 
 OBJECTS = $(addprefix $(OBJDIR)/,$(addsuffix .o,$(UNITS)))
 
