@@ -74,11 +74,14 @@ int main(int argc, char *argv[])
         {
             ClearBackground(BLACK);
 
+            DrawGrid_Here(&currentView);
             DrawFPS(screenWidth-6*fontHeight, screenHeight-30);
 
             DrawPlanets(&currentView);
 
             ShowGUI();
+
+            
                         
         }
         EndDrawing();

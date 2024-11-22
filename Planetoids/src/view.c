@@ -20,7 +20,17 @@ uint32_t delTick = 0u; // To check how many full system update is done for the n
 uint16_t iPlanetInFocus = 0u;
 Font inFont = {0};
 
-
+void DrawGrid_Here(const dtView* const fov) 
+{
+    Vector2 rc = {0};
+    for(int i = 0; i < screenWidth; i++ ) {
+        Vector2 sc = {i,0};
+        rc = toRealCoord(&sc,fov);
+        if( fabsf(fmodf(rc.x, 1e19f))  == 0.f) {
+            DrawLine(i,0,i,screenHeight,BLUE);
+        }
+    }
+}
 
 
 void initView(const char * systemFileName)
@@ -29,6 +39,7 @@ void initView(const char * systemFileName)
     currentView.screenCenter.x = screenWidth*0.5f;
     currentView.screenCenter.y = screenHeight*0.5f;
     currentView.centerFOVinWorld = &(ppBodies[0]->position);
+    currentView.pixelPerMeter = 3.e-6,
 
     InitWindow(screenWidth, screenHeight, systemFileName);
     SetTargetFPS(FPS);               // Set our game to run at 60 frames-per-second
@@ -123,7 +134,7 @@ void ShowGUI(void)
     char textBuff[LINE_LENGTH] = {0};
 
     sprintf(textBuff, 
-    "Real time :\t%.1f day \t\t1 pixel = %2.3E m\nTime Step =\t%.1f s\nAnimation Speed =\t%3.1E week/frameSec.\n System Update in a frame : %d\n",
+    "Real time :\t%.1f day \t\t1 pixel = %2.3E km\nTime Step =\t%.1f s\nAnimation Speed =\t%3.1E week/frameSec.\n System Update in a frame : %d\n",
             scaledElapsedTime/24/3600,
             1.f / currentView.pixelPerMeter,
             deltaTime_s,
@@ -162,7 +173,7 @@ void ShowGUI(void)
     
     textPos.x = 10;
     sprintf(textBuff, 
-        "Screen\tX: %.0f p Y: %.0f p\nReal\tX: %+4.3E m Y: %+4.3E m",
+        "Screen\tX: %.0f p Y: %.0f p\nReal\tX: %+4.3E km Y: %+4.3E km",
         mouseP.x, mouseP.y,
         pointerWorld.x, pointerWorld.y);
 

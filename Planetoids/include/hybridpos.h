@@ -6,7 +6,7 @@
 #include "raylib.h"
 #include "raymath.h"
 
-#define GRID_SCALE ((float)(1.496e9f)) // Closest exact float32 number to 0.1 Astrtonomical Unit
+#define GRID_SCALE ((float)(1.496e10f)) // Closest exact float32 number to 0.1 Astrtonomical Unit
 #define INV_GRID_SCALE ((float)(1.f/GRID_SCALE)) 
 #define SQRT_GRID_SCALE ((float)(sqrtf(GRID_SCALE))) 
 

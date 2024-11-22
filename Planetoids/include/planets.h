@@ -20,11 +20,15 @@
 #define TRAIL_LENGTH        (2000u)
 #define TRAIL_MAX_ALPHA        (156)
 
-#define SCALE_RADIUS            (1e3f) /*km*/
-#define SCALE_POSITION          (1e9f) /*million km*/
-#define SCALE_VELOCITY          (1e3f) /*km/s*/
+#define SCALE_RADIUS            (1.f) /*km*/
+//#define SCALE_POSITION          (1e9f) /*million km*/
+//#define SCALE_VELOCITY          (1e3f) /*km/s*/
 
-#define GAMMA (6.674e-11f)
+#define SCALE_POSITION          (1e6f) /* million km to km*/
+#define SCALE_VELOCITY          (1.f) /* km/s to km/s*/
+
+//#define GAMMA (6.674e-11f)
+#define GAMMA (6.674e-17f)
 #define ORIG_2  {0.f,   0.f}
 
 #define M_SUN           (1.989e30f) // kg

@@ -139,6 +139,7 @@ void Newton2(
         }
         Vector2 field;
         Gravity(&pB->position, &field);
+        field = Vector2Scale(field, 1e-3f);// Scaling to kg*km/s/s
         pB->velocity = Vector2Add(pB->velocity, Vector2Scale(field, deltaTs));
         pB->position = Vector2Add(pB->position, Vector2Scale(pB->velocity, deltaTs));
     }
