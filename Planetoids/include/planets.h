@@ -78,8 +78,14 @@
 #define D_SUN_NEPTUNE        (4.5e12f)
 #define D_SUN_PLUTO      (5.90638e12f)
 
+typedef struct dtVectordd_t {
+    double x;
+    double y;
+}dtVector2_d;
+
+
 typedef struct dtTrace_t {
-    Vector2 position;
+    dtVector2_d position;
     float   alpha;
 }dtTrace;
 
@@ -88,7 +94,6 @@ typedef struct dtPolar2_t {
     float t;
 }dtPolar2;
 
-
 typedef struct dtPlanet_t{
     unsigned long int ID;
     char    name[MAXNAME_LENGTH];
@@ -96,8 +101,8 @@ typedef struct dtPlanet_t{
     bool    movable;
     float   mass;
     dtHybridMagnitudeVector hPos;
-    Vector2 position;
-    Vector2 velocity;
+    dtVector2_d position;
+    dtVector2_d velocity;
     float   initialEnergy;
     float   currentEnergy;
     Color   color;
