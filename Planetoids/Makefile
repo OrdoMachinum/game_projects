@@ -1,5 +1,5 @@
 PROJECT = planets
-UNITS = hybridpos inputs view phyics planets main
+UNITS = vecdouble hybridpos inputs view phyics planets main
 
 OBJECTS = $(addprefix $(OBJDIR)/,$(addsuffix .o,$(UNITS)))
 
@@ -26,8 +26,8 @@ CC = x86_64-w64-mingw32-gcc
 OUT_EXTENSION = .exe
 OBJDIR = obj_win
 OUT_DIR = bin/win
-LDLIBS = -I$(RAYLIB_INSTALL_DIR)include// -static-libgcc -lopengl32 -lgdi32 -lwinmm -static -lpthread -lm
-OBJECTS += $(RAYLIB_INSTALL_DIR)//lib//libraylib.a
+LDLIBS = -I$(strip $(RAYLIB_INSTALL_DIR))/include// -static-libgcc -lopengl32 -lgdi32 -lwinmm -static -lpthread -lm
+OBJECTS += $(strip $(RAYLIB_INSTALL_DIR))/lib//libraylib.a
 CFLAGS = -Wall $(LDLIBS)
 else ifeq ($(TARGET),BUILD_FOR_WINDOWS)
 $(info Building FOR windows ON LINUX ...)

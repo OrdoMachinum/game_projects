@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
             // intependent of the framerate, so the numerical instability culd be elminated.
             simFrameTime += deltaTime_s;
 
-            Newton2(deltaTime_s);  // Physical world update
+            Newton2D(deltaTime_s);  // Physical world update
             //Newton2WithHybridPositioning(deltaTime_s);  // Physical world update
             delTick++;
             

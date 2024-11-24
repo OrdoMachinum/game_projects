@@ -1,6 +1,8 @@
 #ifndef VECDOUBLE_H
 #define VECDOUBLE_H
 
+#include <math.h>
+
 
 typedef struct dtVector2_t {
     double x;

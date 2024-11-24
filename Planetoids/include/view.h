@@ -10,12 +10,13 @@
 #include "physics.h"
 #include "inputs.h"
 #include "hybridpos.h"
+#include "vecdouble.h"
 
 #define LINE_LENGTH (250)
 #define FPS     (60u)
 
 typedef struct dtView_tag{
-    Vector2 * centerFOVinWorld;
+    dtVector2 * centerFOVinWorld;
     Vector2 screenCenter;
     float pixelPerMeter;
     float pixelPerMeterPlanets;
@@ -42,7 +43,7 @@ void ShowGUI(void);
 
 void printDats(FILE * const gp, const dtMassPoint * pl);
 
-Vector2 toRealCoord(const Vector2 * const screenCoord, const dtView* const fov);
+dtVector2 toRealCoord(const Vector2 * const screenCoord, const dtView* const fov);
 
 
 #endif

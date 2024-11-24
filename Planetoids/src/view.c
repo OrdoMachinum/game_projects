@@ -22,7 +22,7 @@ Font inFont = {0};
 
 void DrawGrid_Here(const dtView* const fov) 
 {
-    Vector2 rc = {0};
+    dtVector2 rc = {0};
     for(int i = 0; i < screenWidth; i++ ) {
         Vector2 sc = {i,0};
         rc = toRealCoord(&sc,fov);
@@ -46,7 +46,7 @@ void initView(const char * systemFileName)
     inFont = LoadFontEx("resources/Terminus.ttf",fontHeight, NULL,0);
 }
 
-Vector2 toScreenCoord(const Vector2 * const realCoord, const dtView* const fov) 
+Vector2 toScreenCoord(const dtVector2 * const realCoord, const dtView* const fov) 
 {
     Vector2 retV;
     // Calculation in double precision to lessening the numerical error
@@ -65,13 +65,16 @@ Vector2 toScreenCoord(const Vector2 * const realCoord, const dtView* const fov)
     return retV;
 }
 
-Vector2 toRealCoord(const Vector2 * const screenCoord, const dtView* const fov) 
+dtVector2 toRealCoord(const Vector2 * const screenCoord, const dtView* const fov) 
 {
-    Vector2 w = Vector2Subtract(fov->screenCenter, *screenCoord);
+    dtVector2 w = {
+        .x = fov->screenCenter.x - screenCoord->x,
+        .y = fov->screenCenter.y - screenCoord->y
+    };
 
-    w = Vector2Scale(w, 1.f/fov->pixelPerMeter);
+    V2_scale(&w, 1./fov->pixelPerMeter);
+    V2_add(&w, fov->centerFOVinWorld,&w);
 
-    w = Vector2Add(*(fov->centerFOVinWorld), w);
     return w;
 }
 
@@ -169,7 +172,7 @@ void ShowGUI(void)
 
     memset(textBuff, 0, LINE_LENGTH);
 
-    Vector2 pointerWorld = toRealCoord(&mouseP, &currentView);
+    dtVector2 pointerWorld = toRealCoord(&mouseP, &currentView);
     
     textPos.x = 10;
     sprintf(textBuff, 

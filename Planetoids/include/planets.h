@@ -13,6 +13,7 @@
 #include "raymath.h"
 #include "errorID.h"
 #include "hybridpos.h"
+#include "vecdouble.h"
 
 #define SYS_INCREMENT       (40u)
 #define MAXNAME_LENGTH      (35)
@@ -28,7 +29,7 @@
 #define SCALE_VELOCITY          (1.f) /* km/s to km/s*/
 
 //#define GAMMA (6.674e-11f)
-#define GAMMA (6.674e-17f)
+#define GAMMA (6.674e-17)
 #define ORIG_2  {0.f,   0.f}
 
 #define M_SUN           (1.989e30f) // kg
@@ -78,14 +79,8 @@
 #define D_SUN_NEPTUNE        (4.5e12f)
 #define D_SUN_PLUTO      (5.90638e12f)
 
-typedef struct dtVectordd_t {
-    double x;
-    double y;
-}dtVector2_d;
-
-
 typedef struct dtTrace_t {
-    dtVector2_d position;
+    dtVector2 position;
     float   alpha;
 }dtTrace;
 
@@ -101,8 +96,9 @@ typedef struct dtPlanet_t{
     bool    movable;
     float   mass;
     dtHybridMagnitudeVector hPos;
-    dtVector2_d position;
-    dtVector2_d velocity;
+    dtVector2 position;
+    dtVector2 velocity;
+    double  gravitationalPotential;
     float   initialEnergy;
     float   currentEnergy;
     Color   color;

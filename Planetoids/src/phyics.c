@@ -12,8 +12,8 @@ pthread_t worker1;
 pthread_t worker2;
 
 uint64_t trailTickNum = 0;
-float sysFullEnergyInit = 0.f;
-float sysFullEnergy = 0.f;
+double sysFullEnergyInit = 0.f;
+double sysFullEnergy = 0.f;
 const float simultionScaling  = 1.f * 3600.f; // [s]
 float scaledElapsedTime = 0.f;
 
@@ -52,32 +52,16 @@ void calcSysFullEnergy(void)
 
 void updateEnergyOfBody(dtMassPoint * const body) 
 {
-    body->currentEnergy = KineticEnergy(body) + body->mass * GravPot(&body->position);
+    body->currentEnergy = KineticEnergy(body) + body->mass * GravPotD(body);
 }
 
-float KineticEnergy (const dtMassPoint * const body) 
+double KineticEnergy (const dtMassPoint * const body) 
 {
-    return 0.5f * Vector2LengthSqr(body->velocity) * body->mass;
+    double v = V2_length(&body->velocity);
+    return 0.5f * v*v * body->mass;
 }
 
-float GravPot (
-    const Vector2 * const position) 
-{
-    float potential = 0.f;
-    for(uint32_t j = 0u; j < getNumPlanets(); j++){
-
-        dtMassPoint * pB = *(ppBodies + j);
-
-        if(Vector2Equals(pB->position, *position )){
-            continue;
-        }
-        float r_ij = Vector2Distance(*position, pB->position);
-
-        potential += (-GAMMA * pB->mass/r_ij);
-    }
-    return potential;
-}
-
+/*
 static void Gravity(
     const Vector2 * const position,
     Vector2 * const field)
@@ -94,6 +78,30 @@ static void Gravity(
         iForce = Vector2Scale(iForce,
             (-GAMMA * pB->mass/Vector2DistanceSqr(*position, pB->position )) );
         *field = Vector2Add(*field, iForce);
+    }
+}
+*/
+static void GravityD(
+    const dtMassPoint * atBody,
+    dtVector2 * const field)
+{
+    field->x = 0.;
+    field->y = 0.;
+
+    for(uint32_t i = 0u; i < getNumPlanets(); i++){
+        dtMassPoint * pB = *(ppBodies + i);
+        if(atBody->ID == pB->ID){
+            continue;
+        }
+        dtVector2 iForce = {0};
+        V2_sub(&atBody->position, &pB->position, &iForce);         // r1 - r2
+        
+        double dist = V2_length(&iForce);               // length(r12)
+        
+        double iF = -GAMMA*pB->mass/dist/dist/dist;
+
+        V2_scale(&iForce,iF);
+        V2_add(field,&iForce,field);
     }
 }
 
@@ -127,7 +135,7 @@ static void GravityWithHybridPosition(
         *field = Vector2Add(*field, iForce);
     }
 }
-
+/*
 void Newton2(
     const float deltaTs) 
 {
@@ -144,6 +152,58 @@ void Newton2(
         pB->position = Vector2Add(pB->position, Vector2Scale(pB->velocity, deltaTs));
     }
 }
+*/
+
+void Newton2D(
+    const float deltaTs) 
+{
+    for(uint32_t i = 0u; i < getNumPlanets(); i++) {
+        dtMassPoint * pB = *(ppBodies + i);
+
+        if(!pB->movable) {
+            continue;
+        }
+        dtVector2 field;
+        GravityD(pB, &field);
+        
+        V2_scale(&field, 1e-3f);// Scaling to kg*km/s/s
+        
+        dtVector2 deltaVelocity = {
+            .x = field.x * deltaTs,
+            .y = field.y * deltaTs};
+        
+        V2_add(&pB->velocity, &deltaVelocity, &pB->velocity);
+
+        dtVector2 deltaPos = {
+            .x = pB->velocity.x * deltaTs,
+            .y = pB->velocity.y * deltaTs};
+
+        V2_add(&pB->position, &deltaPos, &pB->position);
+    }
+}
+
+double GravPotD (
+    const dtMassPoint * atBody) 
+{
+    double potential = 0.f;
+    for(uint32_t j = 0u; j < getNumPlanets(); j++){
+
+        dtMassPoint * pB = *(ppBodies + j);
+
+        if(pB->ID == atBody->ID){
+            continue;
+        }
+        dtVector2 r_ij = {0};
+        V2_sub(&pB->position, &atBody->position, &r_ij);
+
+        double d = V2_length(&r_ij);
+
+        potential += (-GAMMA * pB->mass/d);
+    }
+    return potential;
+}
+
+/*
 void Newton2WithHybridPositioning(
     const float deltaTs)
 {
@@ -222,3 +282,5 @@ void Newton2WithThreads(
     trailTickNum++;
     return;
 }
+
+*/
