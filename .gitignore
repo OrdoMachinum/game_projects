@@ -39,6 +39,7 @@ output/
 [dD]ebug/
 [rR]elease/
 [bB]in/
+[bB]uild/
 
 # STM32CubeIDE
 .metadata/

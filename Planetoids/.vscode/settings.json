@@ -11,6 +11,7 @@
         "features.h": "c",
         "inputs.h": "c",
         "errorid.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "vecdouble.h": "c"
     }
 }
