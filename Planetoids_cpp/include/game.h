@@ -19,6 +19,24 @@
 #include "celestial.h"
 #include "celestialview.h"
 
+constexpr size_t textBufSize{1024};
+constexpr float fontHeight{18};
+constexpr float fontWidth{fontHeight * 0.55f};
+
+enum class Info {
+    None=0,
+    GravInteractionMatrix,
+    Masses,
+    LAST,
+};
+
+enum class Indicators {
+    None=0,
+    StrongestInteraction,
+    Velocity,
+    LAST,
+};
+
 class Game
 {
 public:
@@ -42,18 +60,28 @@ private:
     void AddCelestial(const WorldVector& position, const WorldVector& velocity,  const float mass, const float radius, const std::string& name="", const Color& color=WHITE);
 
     void DrawCelestials();
-    void DrawAWorldVector(const WorldVector& showVector, const WorldVector& originVector);
+    void DrawAWorldVector(const WorldVector & headVector, const WorldVector & originVector, const float scale=1.f);
+    
     void DrawUI();
 
     void CalcGravityMatrix();
     WorldVector ForceGrav_ij(const size_t i, const size_t j);
     void Newton2();
 
+    int m_info{0};
+    int m_indicator{0};
+
     void PrintGravityMatrix();
+    void PrintPlanetInfos();
+    void PrintLabels();    
+    void PrintHelp();    
 
     size_t m_scrWidth{};
     size_t m_scrHeight{};
     size_t m_targetFPS{};
+
+    char m_bufScreenText[textBufSize]{0};
+    Font m_mainScreenMonoFont{};
 
     Camera2D m_camera{};
     size_t m_centerOnObject{0};

@@ -30,6 +30,11 @@ LENGTH_TYPE operator*(const WorldVector& vector_a, const WorldVector& vector_b)
     return  vector_a.q1 * vector_b.q1 + vector_a.q2 * vector_b.q2;
 }
 
+bool operator<(const WorldVector& a, const WorldVector& b)
+{
+    return a.length() < b.length();
+}
+
 
 LENGTH_TYPE WorldVector::length() const
 {
@@ -75,6 +80,11 @@ WorldVector WorldVector::toCartesian() const
     };
 }
 
+WorldVector WorldVector::rotate(LENGTH_TYPE phiDEG) const
+{
+    return WorldVector{.q1{this->q1*cosf(phiDEG) - this->q2*sinf(phiDEG)},
+                       .q2{this->q1*sinf(phiDEG) + this->q2*cosf(phiDEG)}};
+}
 
 WorldVector VecVecSum(const std::vector<WorldVector> & vv)
 {
@@ -82,6 +92,24 @@ WorldVector VecVecSum(const std::vector<WorldVector> & vv)
 
     for (size_t i = 0u; i < vv.size(); ++i) {
         sum = sum + vv[i];
+    }
+    return sum;
+}
+
+WorldVector VecVecSum(const std::vector<WorldVector>& vv, int & indexOfBiggest)
+{
+    WorldVector sum{0., 0.};
+    WorldVector biggest{0., 0.};
+
+    for (size_t i = 0u; i < vv.size(); ++i) {
+
+        const WorldVector& current{vv[i]};
+        sum = sum + current;
+
+        if(biggest < current) {
+            indexOfBiggest = i;
+            biggest = current;
+        }
     }
     return sum;
 }

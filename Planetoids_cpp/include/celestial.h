@@ -17,6 +17,8 @@ public:
     WorldVector position{0};
     WorldVector velocity{0};
 
+    int underTheStrongestInflunceOf{-1};
+
     bool isMovable{true};
 
     size_t id() const;
