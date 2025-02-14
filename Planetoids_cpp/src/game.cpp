@@ -12,6 +12,8 @@ Game::Game(const std::string & windowTitle, const size_t windowWidth, const size
     if(m_gameInstanceNumber) {
         throw "Only one game instance is allowed at a time";
     }
+    
+
     m_gameInstanceNumber++;
 }
 
@@ -143,7 +145,7 @@ void DrawAScreenVector(const Vector2 & head, const Vector2 & origin)
 
 void Game::DrawUI()
 {
-    
+    PrintHelp();
     PrintLabels();
     switch(static_cast<Info>(m_info)) {
         case (Info::GravInteractionMatrix) : {
@@ -179,42 +181,45 @@ void Game::CalcGravityMatrix()
 
 void Game::PrintGravityMatrix()
 {
-    memset(m_bufScreenText, 0, textBufSize);
+    m_bufScreenText.fill(0);
+    char* buff{m_bufScreenText.data()};
+
     DrawFPS(0,0);
     Vector2 textPos = {30,30};
     size_t ic{0};
 
-    for (size_t i = 0u; i < m_system.size() && (ic < textBufSize-3); ++i) {
-        for (size_t j = 0; j < m_system.size() && (ic < textBufSize-3); ++j) {
+    for (size_t i = 0u; i < m_system.size() && (ic < textBufSize-30); ++i) {
+        for (size_t j = 0; j < m_system.size() && (ic < textBufSize-30); ++j) {
             
-            ic += sprintf(m_bufScreenText+ic, "%+2.2e ", m_gravityMatrix[i][j].q2);
+            ic += sprintf(buff+ic, "%+2.2e ", m_gravityMatrix[i][j].q2);
         }
-        ic += sprintf(m_bufScreenText+ic,"\n");
+        ic += sprintf(buff+ic,"\n");
 
     }
-    sprintf(m_bufScreenText+ic,"\n");
+    sprintf(buff+ic,"\n");
 
-    m_bufScreenText[textBufSize-1]=0;
-    DrawTextEx(m_mainScreenMonoFont, m_bufScreenText, textPos, fontHeight,1,GREEN);
+    buff[textBufSize-1]=0;
+    DrawTextEx(m_mainScreenMonoFont, buff, textPos, fontHeight,1,GREEN);
 }
 
 void Game::PrintPlanetInfos()
 {
-    memset(m_bufScreenText, 0, textBufSize);
+    m_bufScreenText.fill(0);
+    char* buff{m_bufScreenText.data()};
+    
     Vector2 textPos = {m_scrWidth/2, 30};
     size_t ic{0};
 
-    for (size_t i = 0u; i < m_system.size() && (ic < textBufSize-3); ++i) {
+    for (size_t i = 0u; i < m_system.size() && (ic < textBufSize-50); ++i) {
         const Celestial& iP{m_system[i]};
 
-        ic += sprintf(m_bufScreenText+ic,
+        ic += sprintf(buff+ic,
         "%2d# %2.2e kg, strongest interaction with: %2d#\n", 
         iP.id(), iP.mass, iP.underTheStrongestInflunceOf);   
     }
 
-    m_bufScreenText[textBufSize-1]=0;
-    DrawTextEx(m_mainScreenMonoFont, m_bufScreenText,textPos, fontHeight,1,YELLOW);   
-    //memset(m_bufScreenText, 0, textBufSize);
+    buff[textBufSize-1]=0;
+    DrawTextEx(m_mainScreenMonoFont, buff, textPos, fontHeight,1,YELLOW);   
 }
 
 void Game::PrintLabels()
@@ -231,7 +236,10 @@ void Game::PrintLabels()
 
 void Game::PrintHelp()
 {
-    
+    std::string helpMessage{
+        "F1: change displayed information, F2: change indicators, Right-Click: Add a moon"
+    };
+    DrawText(helpMessage.c_str(), 0, m_scrHeight-20, 20, GRAY);
 }
 
 WorldVector Game::ForceGrav_ij(const size_t i, const size_t j)

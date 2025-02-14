@@ -1,20 +1,17 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <cstdio>
+
 #include <iostream>
 #include <string>
-
 #include <vector>
-#include <raylib.h>
+#include <memory>
 
 #include <raylib.h>
 #include <raymath.h>
 
-#include <cstdio>
-
 #include "solarconstants.h"
-#include "worldvector.h"
-
 #include "worldvector.h"
 #include "celestial.h"
 #include "celestialview.h"
@@ -80,7 +77,12 @@ private:
     size_t m_scrHeight{};
     size_t m_targetFPS{};
 
-    char m_bufScreenText[textBufSize]{0};
+    //char m_bufScreenText[textBufSize]{0};
+    //std::shared_ptr<char> m_bufScreenText{};
+    std::array<char, textBufSize> m_bufScreenText{0};
+
+
+
     Font m_mainScreenMonoFont{};
 
     Camera2D m_camera{};
