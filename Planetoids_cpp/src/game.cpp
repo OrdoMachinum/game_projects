@@ -224,13 +224,17 @@ void Game::PrintPlanetInfos()
 
 void Game::PrintLabels()
 {
-    char label[4]{0};
+    int size{20};
     for(const auto & planet : m_system) {
-        Vector2 scr {GetWorldToScreen2D({planet.position.q1, planet.position.q2}, m_camera)};
-        //scr.y -= 30;
+        Vector2 scrUnbound {GetWorldToScreen2D({planet.position.q1, planet.position.q2}, m_camera)};
+        
         char label[4]{0};
-        sprintf (label, "%3d", planet.id());
-        DrawTextEx(m_mainScreenMonoFont,label,scr,20,1,BLUE);
+
+        int numchar{sprintf (label, "%3d", planet.id())};
+
+        Vector2 scr{Vector2Clamp(scrUnbound,{0,0},{m_scrWidth-(numchar*size), m_scrHeight-2*size})};
+
+        DrawTextEx(m_mainScreenMonoFont,label,scr,size,1,BLUE);
     }
 }
 
