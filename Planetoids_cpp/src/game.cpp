@@ -56,13 +56,14 @@ void Game::GenerateOutput()
 {
     BeginDrawing();
     ClearBackground(BLACK);
-
-    BeginMode2D(m_camera);
-    DrawCelestials();
-    EndMode2D();
-
+        
     DrawUI();
 
+    BeginMode2D(m_camera);
+    {
+        DrawCelestials();
+    }    
+    EndMode2D();
 
     EndDrawing();
 }
@@ -256,7 +257,7 @@ void Game::PrintZoomLevel(const size_t xScr, const size_t yScr)
     m_bufScreenText.fill(0);
     char* buff{m_bufScreenText.data()};
     sprintf(buff,"zoom: %2.2e m/px", 1.f/m_camera.zoom);
-    DrawTextEx(m_mainScreenMonoFont,buff,textPos,20,1,RED);
+    DrawTextEx(m_mainScreenMonoFont,buff,textPos,m_fontSize,1,RED);
 }
 
 void Game::PrintCoordinates(
@@ -270,7 +271,7 @@ void Game::PrintCoordinates(
 
     sprintf(m_bufScreenText.data(),"x = %+1.2em,  y = %1.2em", mouseWrld.x, mouseWrld.y);
 
-    DrawTextEx(m_mainScreenMonoFont,m_bufScreenText.data(),textPos,20,1,RED);
+    DrawTextEx(m_mainScreenMonoFont,m_bufScreenText.data(),textPos,m_fontSize,1,RED);
 }
 
 void Game::DrawGrid(const Color& gridColor)
@@ -279,21 +280,24 @@ void Game::DrawGrid(const Color& gridColor)
     Vector2 origo{GetWorldToScreen2D({0.,0.}, m_camera)};
     size_t tickSize{3};
 
-
-    origo = Vector2Clamp(origo,{2,2}, {static_cast<float>(m_scrWidth)-2, static_cast<float>(m_scrHeight)-2});
-
+    //origo = Vector2Clamp(origo,{2,2}, {static_cast<float>(m_scrWidth)-2, static_cast<float>(m_scrHeight)-2});
+    
     DrawLine(0, origo.y, m_scrWidth, origo.y, gridColor);
     DrawLine(origo.x, 0, origo.x, m_scrHeight, gridColor);
 
-    int k{m_scrWidth/tickDistance};
+    if(10>tickDistance) {
+        return;
+    }
+    int k{100*m_scrWidth/tickDistance};
 
     for(int i{-k}; i < k; ++i){
-
+        
         DrawLine(origo.x + tickDistance*i, origo.y-tickSize,
-                 origo.x + tickDistance*i, origo.y+tickSize, LIME);
+                 origo.x + tickDistance*i, origo.y+tickSize, gridColor);
 
+        DrawLine(origo.x - tickSize, origo.y + tickDistance*i,
+                 origo.x + tickSize, origo.y + tickDistance*i, gridColor);
     }
-
 }
 
 WorldVector Game::ForceGrav_ij(const size_t i, const size_t j)
