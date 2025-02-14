@@ -1,5 +1,4 @@
 #include "game.h"
-#include <string.h>
 
 int Game::m_gameInstanceNumber{0};
 
@@ -145,15 +144,21 @@ void DrawAScreenVector(const Vector2 & head, const Vector2 & origin)
 
 void Game::DrawUI()
 {
-    PrintHelp();
-    PrintLabels();
+    size_t line{0};
+    DrawFPS(0, m_fontSize*line++);
+    PrintZoomLevel(0, m_fontSize*line++);
+    PrintCoordinates(0,m_fontSize*line++);
+    PrintHelp(0, m_scrHeight-30);
+    PrintLabels(10);
+    DrawGrid();
+
     switch(static_cast<Info>(m_info)) {
         case (Info::GravInteractionMatrix) : {
-            PrintGravityMatrix();
+            PrintGravityMatrix(0,m_fontSize*line);
             break;
         }
         case (Info::Masses): {
-            PrintPlanetInfos();
+            PrintPlanetInfos(0,m_fontSize*line);
             break;
         }
         default:
@@ -179,13 +184,12 @@ void Game::CalcGravityMatrix()
     }
 }
 
-void Game::PrintGravityMatrix()
+void Game::PrintGravityMatrix(const size_t xScr, const size_t yScr)
 {
     m_bufScreenText.fill(0);
     char* buff{m_bufScreenText.data()};
 
-    DrawFPS(0,0);
-    Vector2 textPos = {30,30};
+    Vector2 textPos = {xScr, yScr};
     size_t ic{0};
 
     for (size_t i = 0u; i < m_system.size() && (ic < textBufSize-30); ++i) {
@@ -199,15 +203,15 @@ void Game::PrintGravityMatrix()
     sprintf(buff+ic,"\n");
 
     buff[textBufSize-1]=0;
-    DrawTextEx(m_mainScreenMonoFont, buff, textPos, fontHeight,1,GREEN);
+    DrawTextEx(m_mainScreenMonoFont, buff, textPos, m_fontSize, 1, GREEN);
 }
 
-void Game::PrintPlanetInfos()
+void Game::PrintPlanetInfos(const size_t xScr, const size_t yScr)
 {
     m_bufScreenText.fill(0);
     char* buff{m_bufScreenText.data()};
     
-    Vector2 textPos = {m_scrWidth/2, 30};
+    Vector2 textPos = {xScr, yScr};
     size_t ic{0};
 
     for (size_t i = 0u; i < m_system.size() && (ic < textBufSize-50); ++i) {
@@ -219,12 +223,11 @@ void Game::PrintPlanetInfos()
     }
 
     buff[textBufSize-1]=0;
-    DrawTextEx(m_mainScreenMonoFont, buff, textPos, fontHeight,1,YELLOW);   
+    DrawTextEx(m_mainScreenMonoFont, buff, textPos, m_fontSize,1,YELLOW);   
 }
 
-void Game::PrintLabels()
-{
-    int size{20};
+void Game::PrintLabels(const size_t siz)
+{   
     for(const auto & planet : m_system) {
         Vector2 scrUnbound {GetWorldToScreen2D({planet.position.q1, planet.position.q2}, m_camera)};
         
@@ -232,18 +235,65 @@ void Game::PrintLabels()
 
         int numchar{sprintf (label, "%3d", planet.id())};
 
-        Vector2 scr{Vector2Clamp(scrUnbound,{0,0},{m_scrWidth-(numchar*size), m_scrHeight-2*size})};
+        Vector2 scr{Vector2Clamp(scrUnbound,{0,0},{m_scrWidth-(numchar*siz), m_scrHeight-2*siz})};
 
-        DrawTextEx(m_mainScreenMonoFont,label,scr,size,1,BLUE);
+        DrawTextEx(m_mainScreenMonoFont, label, scr, m_fontSize, 1, BLUE);
     }
 }
 
-void Game::PrintHelp()
+void Game::PrintHelp(const size_t xScr, const size_t yScr)
 {
+    Vector2 scr{xScr,yScr};
     std::string helpMessage{
         "F1: change displayed information, F2: change indicators, Right-Click: Add a moon"
     };
-    DrawText(helpMessage.c_str(), 0, m_scrHeight-20, 20, GRAY);
+    DrawTextEx(m_mainScreenMonoFont, helpMessage.c_str(),scr, m_fontSize, 1, GRAY);
+}
+
+void Game::PrintZoomLevel(const size_t xScr, const size_t yScr)
+{
+    Vector2 textPos = {xScr, yScr};
+    m_bufScreenText.fill(0);
+    char* buff{m_bufScreenText.data()};
+    sprintf(buff,"zoom: %2.2e m/px", 1.f/m_camera.zoom);
+    DrawTextEx(m_mainScreenMonoFont,buff,textPos,20,1,RED);
+}
+
+void Game::PrintCoordinates(
+    const size_t xScr, 
+    const size_t yScr)
+{
+    Vector2 textPos = {xScr, yScr};
+    m_bufScreenText.fill(0);
+
+    Vector2 mouseWrld{GetScreenToWorld2D(GetMousePosition(), m_camera)};
+
+    sprintf(m_bufScreenText.data(),"x = %+1.2em,  y = %1.2em", mouseWrld.x, mouseWrld.y);
+
+    DrawTextEx(m_mainScreenMonoFont,m_bufScreenText.data(),textPos,20,1,RED);
+}
+
+void Game::DrawGrid(const Color& gridColor)
+{
+    const int tickDistance{D_EARTH_MOON*m_camera.zoom};
+    Vector2 origo{GetWorldToScreen2D({0.,0.}, m_camera)};
+    size_t tickSize{3};
+
+
+    origo = Vector2Clamp(origo,{2,2}, {static_cast<float>(m_scrWidth)-2, static_cast<float>(m_scrHeight)-2});
+
+    DrawLine(0, origo.y, m_scrWidth, origo.y, gridColor);
+    DrawLine(origo.x, 0, origo.x, m_scrHeight, gridColor);
+
+    int k{m_scrWidth/tickDistance};
+
+    for(int i{-k}; i < k; ++i){
+
+        DrawLine(origo.x + tickDistance*i, origo.y-tickSize,
+                 origo.x + tickDistance*i, origo.y+tickSize, LIME);
+
+    }
+
 }
 
 WorldVector Game::ForceGrav_ij(const size_t i, const size_t j)

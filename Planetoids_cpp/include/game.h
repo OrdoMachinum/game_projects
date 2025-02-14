@@ -68,22 +68,23 @@ private:
     int m_info{0};
     int m_indicator{0};
 
-    void PrintGravityMatrix();
-    void PrintPlanetInfos();
-    void PrintLabels();    
-    void PrintHelp();    
+    void PrintGravityMatrix(const size_t xScr=0, const size_t yScr=0);
+    void PrintPlanetInfos(const size_t xScr=0, const size_t yScr=0);
+    void PrintLabels(const size_t siz=20);    
+    void PrintHelp(const size_t xScr=0, const size_t yScr=0);
+    void PrintZoomLevel(const size_t xScr=0, const size_t yScr=0);
+    void PrintCoordinates(const size_t xScr=0, const size_t yScr=0);
+
+    void DrawGrid(const Color& gridColor=DARKGRAY);
 
     size_t m_scrWidth{};
     size_t m_scrHeight{};
     size_t m_targetFPS{};
 
-    //char m_bufScreenText[textBufSize]{0};
-    //std::shared_ptr<char> m_bufScreenText{};
     std::array<char, textBufSize> m_bufScreenText{0};
 
-
-
     Font m_mainScreenMonoFont{};
+    size_t m_fontSize{static_cast<size_t>(fontHeight)};
 
     Camera2D m_camera{};
     size_t m_centerOnObject{0};
