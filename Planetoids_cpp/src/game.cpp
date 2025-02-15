@@ -80,10 +80,12 @@ void Game::AddCelestial(
     m_sysView.push_back({name, color});
 
     m_gravityMatrix.push_back(std::vector<WorldVector>(m_system.size()));
+    m_collisionCelestialMatrix.push_back(std::vector<bool>(m_system.size()));
 
 
     for (size_t i = 0; i < m_system.size()-1; ++i) {
         m_gravityMatrix.at(i).push_back({0., 0.});
+        m_collisionCelestialMatrix.at(i).push_back(false);
     }
 
 }
@@ -322,10 +324,22 @@ void Game::Newton2()
         iP.position = iP.position + m_deltaTime * iP.velocity;
 
     }
+
 }
 
+void Game::CalcCollisionCelestialsMatrix()
+{
+    for()
 
+}
 
+void Game::MergeCelestials()
+{
+}
+
+void Game::SplitCelestial()
+{
+}
 
 void Game::ProcessInput()
 {

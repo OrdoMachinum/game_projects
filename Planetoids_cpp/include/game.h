@@ -65,8 +65,10 @@ private:
     WorldVector ForceGrav_ij(const size_t i, const size_t j);
     void Newton2();
 
-    int m_info{0};
-    int m_indicator{0};
+    void CalcCollisionCelestialsMatrix();
+    void MergeCelestials();
+    void SplitCelestial();
+
 
     void PrintGravityMatrix(const size_t xScr=0, const size_t yScr=0);
     void PrintPlanetInfos(const size_t xScr=0, const size_t yScr=0);
@@ -76,6 +78,9 @@ private:
     void PrintCoordinates(const size_t xScr=0, const size_t yScr=0);
 
     void DrawGrid(const Color& gridColor=DARKGRAY);
+
+    int m_info{0};
+    int m_indicator{0};
 
     size_t m_scrWidth{};
     size_t m_scrHeight{};
@@ -95,6 +100,7 @@ private:
     std::vector<CelestialView> m_sysView;
 
     std::vector<std::vector<WorldVector> > m_gravityMatrix;
+    std::vector<std::vector<bool> > m_collisionCelestialMatrix;
 
     std::string m_windowTitle{};
 
