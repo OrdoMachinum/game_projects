@@ -62,10 +62,14 @@ private:
     void DrawUI();
 
     void CalcGravityMatrix();
+    void CalcConstrainsMatrix();
+    void CalcCollisionCelestialsMatrix();
+
     WorldVector ForceGrav_ij(const size_t i, const size_t j);
+    WorldVector ForcePairConstrain_ij(const size_t i, const size_t j, const LENGTH_TYPE distConst);
     void Newton2();
 
-    void CalcCollisionCelestialsMatrix();
+
     void MergeCelestials();
     void SplitCelestial();
 
@@ -100,6 +104,7 @@ private:
     std::vector<CelestialView> m_sysView;
 
     std::vector<std::vector<WorldVector> > m_gravityMatrix;
+    std::vector<std::vector<WorldVector> > m_pairConstrainMatrix;
     std::vector<std::vector<bool> > m_collisionCelestialMatrix;
 
     std::string m_windowTitle{};

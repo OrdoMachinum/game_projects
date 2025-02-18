@@ -2,6 +2,7 @@
 #define CELESTIAL_H
 #include <cstddef>
 #include <iostream>
+#include <memory>
 #include "worldvector.h"
 
 class Celestial
@@ -18,6 +19,8 @@ public:
     WorldVector velocity{0};
 
     int underTheStrongestInflunceOf{-1};
+
+    int boundTo{-1};
 
     bool isMovable{true};
 

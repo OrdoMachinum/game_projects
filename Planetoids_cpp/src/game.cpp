@@ -34,9 +34,15 @@ bool Game::Initialize()
 
     // Example earth-moon system
     AddCelestial({0,0,VectorCoordinateSystem::Cartesian2d},{0.f, 0.f, VectorCoordinateSystem::Cartesian2d}, M_EARTH, R_EARTH);
-    AddCelestial({0,D_EARTH_MOON,VectorCoordinateSystem::Cartesian2d},{V_MOON, 0.f, VectorCoordinateSystem::Cartesian2d}, 5.*M_MOON, R_MOON);
-    AddCelestial({0,-D_EARTH_MOON,VectorCoordinateSystem::Cartesian2d},{-V_MOON, 0.f, VectorCoordinateSystem::Cartesian2d}, M_MOON, R_MOON);
 
+    AddCelestial({0,D_EARTH_MOON,VectorCoordinateSystem::Cartesian2d},{V_MOON, 0.f, VectorCoordinateSystem::Cartesian2d}, 5.*M_MOON, R_MOON);
+
+    AddCelestial({0,-D_EARTH_MOON,VectorCoordinateSystem::Cartesian2d},{-0.7*V_MOON, 0.f, VectorCoordinateSystem::Cartesian2d}, M_MOON, R_MOON);
+    
+    AddCelestial({0,-2.*D_EARTH_MOON,VectorCoordinateSystem::Cartesian2d},{-V_MOON, 0.f, VectorCoordinateSystem::Cartesian2d}, M_MOON, R_MOON);
+
+//    m_system.at(2).boundTo=3;
+//    m_system.at(3).boundTo=2;
 
     return fine;
 }
@@ -80,11 +86,14 @@ void Game::AddCelestial(
     m_sysView.push_back({name, color});
 
     m_gravityMatrix.push_back(std::vector<WorldVector>(m_system.size()));
+    m_pairConstrainMatrix.push_back(std::vector<WorldVector>(m_system.size()));
+    
     m_collisionCelestialMatrix.push_back(std::vector<bool>(m_system.size()));
 
 
     for (size_t i = 0; i < m_system.size()-1; ++i) {
         m_gravityMatrix.at(i).push_back({0., 0.});
+        m_pairConstrainMatrix.at(i).push_back({0., 0.});
         m_collisionCelestialMatrix.at(i).push_back(false);
     }
 
@@ -186,6 +195,26 @@ void Game::CalcGravityMatrix()
         }
     }
 }
+
+void Game::CalcConstrainsMatrix()
+{
+
+    for (size_t i = 0u; i < m_system.size(); ++i) {
+        if(m_system[i].boundTo < 0) {
+            continue;
+        }
+        for (size_t j = i+1; j < m_system.size(); ++j) {
+          
+            m_pairConstrainMatrix[i][j] = ForcePairConstrain_ij(i, j, 0.5*D_EARTH_MOON);
+            m_pairConstrainMatrix[j][i] = -1. * m_pairConstrainMatrix[i][j];
+        }
+    }
+}
+
+void Game::CalcCollisionCelestialsMatrix()
+{
+}
+
 
 void Game::PrintGravityMatrix(const size_t xScr, const size_t yScr)
 {
@@ -304,10 +333,27 @@ void Game::DrawGrid(const Color& gridColor)
 
 WorldVector Game::ForceGrav_ij(const size_t i, const size_t j)
 {
-    WorldVector dR_ij{m_system[i].position - m_system[j].position};
-    LENGTH_TYPE distance{dR_ij.length()};
+    const WorldVector dR_ij{m_system[i].position - m_system[j].position};
+    const LENGTH_TYPE distance{dR_ij.length()};
 
     return -GAMMA*m_system[i].mass*m_system[j].mass * (1./ distance/distance/distance ) * dR_ij ;
+}
+
+WorldVector Game::ForcePairConstrain_ij(const size_t i, const size_t j, const LENGTH_TYPE distConst)
+{
+    const Celestial &ip{m_system[i]};
+    const Celestial &jp{m_system[j]};
+
+    if(ip.boundTo < 0 || jp.boundTo < 0) {
+        return {0., 0.};
+    }
+
+    const WorldVector dR_ij{ip.position - jp.position};
+    const LENGTH_TYPE distance{dR_ij.length()};
+    const LENGTH_TYPE strength{1e-3};
+    const LENGTH_TYPE DELTA {distance-distConst};
+
+    return WorldVector{-strength * (DELTA*DELTA*DELTA) * (1./distance) * dR_ij};
 }
 
 void Game::Newton2()
@@ -316,10 +362,12 @@ void Game::Newton2()
 
         Celestial& iP{m_system[i]};
 
-        // WorldVector netAcceleration{(1./iP.mass) * VecVecSum(m_gravityMatrix[i])};
-        WorldVector netAcceleration{(1./iP.mass) * VecVecSum(m_gravityMatrix[i], iP.underTheStrongestInflunceOf)};
+        WorldVector netForce{VecVecSum(m_gravityMatrix[i], iP.underTheStrongestInflunceOf)};
 
-        iP.velocity = iP.velocity + m_deltaTime * netAcceleration;
+        netForce = netForce + VecVecSum(m_pairConstrainMatrix[i]);
+
+
+        iP.velocity = iP.velocity + m_deltaTime * (1./iP.mass) * netForce;
 
         iP.position = iP.position + m_deltaTime * iP.velocity;
 
@@ -327,11 +375,6 @@ void Game::Newton2()
 
 }
 
-void Game::CalcCollisionCelestialsMatrix()
-{
-    for()
-
-}
 
 void Game::MergeCelestials()
 {
@@ -382,6 +425,8 @@ void Game::ProcessInput()
 void Game::UpdateGameWorld()
 {
     CalcGravityMatrix();
+    CalcConstrainsMatrix();
+
     Newton2();
 }
 
