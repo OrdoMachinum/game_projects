@@ -33,13 +33,13 @@ bool Game::Initialize()
     fine |= IsFontValid(m_mainScreenMonoFont);
 
     // Example earth-moon system
-    AddCelestial({0,0,VectorCoordinateSystem::Cartesian2d},{0.f, 0.f, VectorCoordinateSystem::Cartesian2d}, M_EARTH, R_EARTH);
+    AddCelestial({0,0},{0.f, 0.f}, M_EARTH, R_EARTH);
 
-    AddCelestial({0,D_EARTH_MOON,VectorCoordinateSystem::Cartesian2d},{V_MOON, 0.f, VectorCoordinateSystem::Cartesian2d}, 5.*M_MOON, R_MOON);
+    AddCelestial({0,D_EARTH_MOON},{V_MOON, 0.f}, 5.*M_MOON, R_MOON);
 
-    AddCelestial({0,-D_EARTH_MOON,VectorCoordinateSystem::Cartesian2d},{-0.7*V_MOON, 0.f, VectorCoordinateSystem::Cartesian2d}, M_MOON, R_MOON);
+    AddCelestial({0,-D_EARTH_MOON},{-0.7*V_MOON, 0.f}, M_MOON, R_MOON);
     
-    AddCelestial({0,-2.*D_EARTH_MOON,VectorCoordinateSystem::Cartesian2d},{-V_MOON, 0.f, VectorCoordinateSystem::Cartesian2d}, M_MOON, R_MOON);
+    AddCelestial({0,-2.*D_EARTH_MOON},{-V_MOON, 0.f}, M_MOON, R_MOON);
 
 //    m_system.at(2).boundTo=3;
 //    m_system.at(3).boundTo=2;
@@ -372,7 +372,6 @@ void Game::Newton2()
         iP.position = iP.position + m_deltaTime * iP.velocity;
 
     }
-
 }
 
 
@@ -410,13 +409,11 @@ void Game::ProcessInput()
     
 
     // Process model related inputs
-
-
     if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
 
         Vector2 PointerInModelWorld {GetScreenToWorld2D(GetMousePosition(), m_camera)};
-        WorldVector newPlanetLoc{PointerInModelWorld.x, PointerInModelWorld.y, VectorCoordinateSystem::Cartesian2d};
-        AddCelestial(newPlanetLoc,{-V_MOON, 0.f, VectorCoordinateSystem::Cartesian2d}, M_MOON, R_MOON);
+        WorldVector newPlanetLoc{PointerInModelWorld.x, PointerInModelWorld.y};
+        AddCelestial(newPlanetLoc,{-V_MOON, 0.f}, M_MOON, R_MOON);
     }
 
 
