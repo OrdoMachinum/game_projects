@@ -366,7 +366,6 @@ void Game::Newton2()
 
         netForce = netForce + VecVecSum(m_pairConstrainMatrix[i]);
 
-
         iP.velocity = iP.velocity + m_deltaTime * (1./iP.mass) * netForce;
 
         iP.position = iP.position + m_deltaTime * iP.velocity;
